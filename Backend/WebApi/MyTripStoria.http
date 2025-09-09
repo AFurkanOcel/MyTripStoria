@@ -1,6 +1,6 @@
 @MyTripStoria_HostAddress = http://localhost:5155
 
-GET {{MyTripStoria_HostAddress}}/weatherforecast/
+GET {{MyTripStoria_HostAddress}}/mytripstoria/
 Accept: application/json
 
 ###

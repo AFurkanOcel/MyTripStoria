@@ -9,6 +9,6 @@ namespace Repositories.Interfaces
 {
     public interface ICountryRepository : IRepository<Country>
     {
-        Task<Country> GetByNameAsync(string name);
+        Task<Country?> GetByNameAsync(string name);
     }
 }
