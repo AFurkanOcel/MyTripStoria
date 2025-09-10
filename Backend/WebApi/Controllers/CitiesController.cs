@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 using Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CitiesController : ControllerBase
     {
         private readonly ICityService _cityService;

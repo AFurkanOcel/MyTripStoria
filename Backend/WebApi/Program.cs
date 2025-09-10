@@ -4,8 +4,19 @@ using Repositories.Implementations;
 using Services.Interfaces;
 using Services.Implementations;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Data;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Authorise (email:Admin@Gmail.com  password:Admim_1234)
+builder.Services.AddDbContext<AuthDbContext>(options =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<AuthDbContext>();
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -28,9 +39,42 @@ builder.Services.AddControllers();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
+    {
+        Title = "My API", Version = "v1" 
+    });
+
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "bearer"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
+
+app.MapIdentityApi<IdentityUser>();
 
 if (app.Environment.IsDevelopment())
 {

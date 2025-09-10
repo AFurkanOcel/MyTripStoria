@@ -1,0 +1,5 @@
+1) autorize ý ekle ilk önce sonra endpointleri ayarla. faruk abi örnek bir proje atýcak bana.
+2) ilk önce contry ve city api larýný düzenle, sonra user sonra da trip i düzenle.
+3) sonrasýnda ise frontend i ayarla.
+
+0) trello da birdahaki paylaþýmýnda, migration eklendi ve veritabaný baðlandý fln yazmayý unutma onu belirtmedin.
