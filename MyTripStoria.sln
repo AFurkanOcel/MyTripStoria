@@ -4,25 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-	ProjectSection(SolutionItems) = preProject
-		index.html = index.html
-		map.html = map.html
-		trips.html = trips.html
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "css", "css", "{2DB7ADDE-837B-4D76-9AD1-13AE063367D2}"
-	ProjectSection(SolutionItems) = preProject
-		map.css = map.css
-		style.css = style.css
-		trips.css = trips.css
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "js", "js", "{9592DC4D-F00C-482E-BF62-A369C229AF69}"
-	ProjectSection(SolutionItems) = preProject
-		main.js = main.js
-		map.js = map.js
-		trips.js = trips.js
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{62157606-20CA-4A41-8B53-41E8D9F041F5}"
 EndProject
@@ -35,6 +16,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Backend\Repositories\Repositories.csproj", "{8EC5A66D-7243-C7F2-823C-C11D674D2289}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entities", "Backend\Entities\Entities.csproj", "{EDED4C77-6C7F-193E-62F5-8F602252CD09}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTripStoria_Frontend", "MyTripStoria_Frontend\MyTripStoria_Frontend.csproj", "{3BF389FF-75DC-4BD5-A8C8-45CC89D54B20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{3DFD5364-AE44-4F25-9B55-61980A3D492E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -62,18 +47,25 @@ Global
 		{EDED4C77-6C7F-193E-62F5-8F602252CD09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDED4C77-6C7F-193E-62F5-8F602252CD09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDED4C77-6C7F-193E-62F5-8F602252CD09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BF389FF-75DC-4BD5-A8C8-45CC89D54B20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BF389FF-75DC-4BD5-A8C8-45CC89D54B20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BF389FF-75DC-4BD5-A8C8-45CC89D54B20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BF389FF-75DC-4BD5-A8C8-45CC89D54B20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DFD5364-AE44-4F25-9B55-61980A3D492E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DFD5364-AE44-4F25-9B55-61980A3D492E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DFD5364-AE44-4F25-9B55-61980A3D492E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DFD5364-AE44-4F25-9B55-61980A3D492E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{2DB7ADDE-837B-4D76-9AD1-13AE063367D2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{9592DC4D-F00C-482E-BF62-A369C229AF69} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{FF832594-E403-2B1F-49E8-55A6A5C58268} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
 		{F9466A6E-3284-E69E-ED34-A10465B132E4} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
 		{4652DC15-5762-DAB2-AB42-4C0C789911AD} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
 		{8EC5A66D-7243-C7F2-823C-C11D674D2289} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
 		{EDED4C77-6C7F-193E-62F5-8F602252CD09} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
+		{3BF389FF-75DC-4BD5-A8C8-45CC89D54B20} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51FC89CF-46AE-4D07-BA78-1188CDE7430F}
