@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Contracts.CityDtos;
 using Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
@@ -10,21 +11,52 @@ namespace Services.Implementations
     public class CityService : ICityService
     {
         private readonly ICityRepository _cityRepository;
+        private readonly ICountryRepository _countryRepository;
 
-        public CityService(ICityRepository cityRepository)
+        public CityService(ICityRepository cityRepository, ICountryRepository countryRepository)
         {
             _cityRepository = cityRepository;
+            _countryRepository = countryRepository;
         }
 
-        public async Task<List<City>> GetAllCitiesAsync()
+        public async Task<List<CityDto>> GetAllCitiesAsync()
         {
-            return await _cityRepository.GetAllAsync();
+            var cities = await _cityRepository.GetAllAsync();
+
+            var cityDtos = new List<CityDto>();
+            foreach (var city in cities)
+            {
+                var country = await _countryRepository.GetByIdAsync(city.CountryId);
+
+                cityDtos.Add(new CityDto
+                {
+                    Id = city.Id,
+                    Name = city.Name,
+                    CountryId = city.CountryId,
+                    CountryName = country?.Name
+                });
+            }
+
+            return cityDtos;
         }
 
-        public async Task<City> GetCityByIdAsync(int cityId)
+        public async Task<CityDto> GetCityByIdAsync(int cityId)
         {
-            return await _cityRepository.GetByIdAsync(cityId);
+            var city = await _cityRepository.GetByIdAsync(cityId);
+            if (city == null)
+                return null;
+
+            var country = await _countryRepository.GetByIdAsync(city.CountryId);
+
+            return new CityDto
+            {
+                Id = city.Id,
+                Name = city.Name,
+                CountryId = city.CountryId,
+                CountryName = country?.Name
+            };
         }
+
 
         public async Task AddCityAsync(City city)
         {

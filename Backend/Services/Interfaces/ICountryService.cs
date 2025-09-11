@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contracts.CountryDtos;
 using Entities;
 
 namespace Services.Interfaces
 {
     public interface ICountryService
     {
-        Task<List<Country>> GetAllCountriesAsync();
-        Task<Country> GetCountryByIdAsync(int countryId);
+        Task<List<CountryDto>> GetAllCountriesAsync();
+        Task<CountryDto> GetCountryByIdAsync(int countryId);
         Task AddCountryAsync(Country country);
         Task<Country> UpdateCountryAsync(Country country);
         Task DeleteCountryAsync(int countryId);

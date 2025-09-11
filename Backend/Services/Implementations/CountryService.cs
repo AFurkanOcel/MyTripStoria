@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Contracts.CityDtos;
+using Contracts.CountryDtos;
 using Entities;
 using Microsoft.EntityFrameworkCore;
 using Repositories.Interfaces;
@@ -17,15 +19,39 @@ namespace Services.Implementations
             _countryRepository = countryRepository;
         }
 
-        public async Task<List<Country>> GetAllCountriesAsync()
+        public async Task<List<CountryDto>> GetAllCountriesAsync()
         {
-            return await _countryRepository.GetAllAsync();
+            var countries = await _countryRepository.GetAllCountryAsync();
+
+            return countries.Select(c => new CountryDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Cities = c.Cities.Select(city => new CityForCountryDto
+                {
+                    Id = city.Id,
+                    Name = city.Name,
+                }).ToList()
+            }).ToList();
         }
 
-        public async Task<Country> GetCountryByIdAsync(int countryId)
+        public async Task<CountryDto?> GetCountryByIdAsync(int id)
         {
-            return await _countryRepository.GetByIdAsync(countryId);
+            var country = await _countryRepository.GetCountryByIdAsync(id);
+            if (country == null) return null;
+
+            return new CountryDto
+            {
+                Id = country.Id,
+                Name = country.Name,
+                Cities = country.Cities.Select(city => new CityForCountryDto
+                {
+                    Id = city.Id,
+                    Name = city.Name,
+                }).ToList()
+            };
         }
+
 
         public async Task AddCountryAsync(Country country)
         {

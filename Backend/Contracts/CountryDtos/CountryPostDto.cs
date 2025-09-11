@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Contracts
+namespace Contracts.CountryDtos
 {
-    public class TripDto
+    public class CountryPostDto
     {
+        public string Name { get; set; }
     }
 }

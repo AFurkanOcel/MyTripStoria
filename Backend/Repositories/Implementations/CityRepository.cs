@@ -17,7 +17,7 @@ namespace Repositories.Implementations
         public async Task<List<City>> GetAllByCountryIdAsync(int countryId)
         {
             return await _context.Cities
-                                 .Where(c => c.CountryId == countryId)
+                                 .Include(c => c.Country)
                                  .ToListAsync();
         }
     }

@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Contracts.UserDtos
+{
+    public class UserDto
+    {
+        public int Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public int Age { get; set; }
+        public int CountryName { get; set; }
+        public int CityName { get; set; }
+        public string Address { get; set; }
+        public decimal Budget { get; set; }
+        public bool IsPremium { get; set; }
+    }
+}

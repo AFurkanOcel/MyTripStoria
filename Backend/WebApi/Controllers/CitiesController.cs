@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Services.Interfaces;
+﻿using System.Diagnostics.Metrics;
+using Contracts.CityDtos;
+using Contracts.CountryDtos;
 using Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Services.Implementations;
+using Services.Interfaces;
 
 namespace WebApi.Controllers
 {
@@ -20,8 +24,17 @@ namespace WebApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var cities = await _cityService.GetAllCitiesAsync();
-            return Ok(cities);
+            var cities = await _cityService.GetAllCitiesAsync();    
+                
+            var cityDtos = cities.Select(c => new CityDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                CountryId = c.CountryId,
+                CountryName = c.CountryName
+            }).ToList();
+
+            return Ok(cityDtos);
         }
 
         [HttpGet("{id}")]
@@ -29,32 +42,59 @@ namespace WebApi.Controllers
         {
             var city = await _cityService.GetCityByIdAsync(id);
             if (city == null) return NotFound();
-            return Ok(city);
+
+            var cityDto = new CityDto
+            {
+                Id = city.Id,
+                Name = city.Name,
+                CountryId = city.CountryId,
+                CountryName = city.CountryName
+            };
+
+            return Ok(cityDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] City city)
+        public async Task<IActionResult> Create([FromBody] CityPostDto cityPostDto)
         {
-            if (city.CountryId == 0)
+            if (cityPostDto.CountryId == 0)
                 return BadRequest("City must have a valid CountryId.");
 
+            // DTO -> Entity
+            var city = new City
+            {
+                Name = cityPostDto.Name,
+                CountryId = cityPostDto.CountryId
+            };
+
             await _cityService.AddCityAsync(city);
-            return CreatedAtAction(nameof(GetById), new { id = city.Id }, city);
+            return CreatedAtAction(nameof(GetById), new { id = city.Id }, cityPostDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] City city)
+        public async Task<IActionResult> Update(int id, [FromBody] CityPutDto cityPutDto)
         {
-            if (id != city.Id) return BadRequest();
+            // DTO -> Entity
+            var city = new City
+            {
+                Id = id,
+                Name = cityPutDto.Name,
+                CountryId = cityPutDto.CountryId,
+            };
+
             var updatedCity = await _cityService.UpdateCityAsync(city);
-            return Ok(updatedCity);
+            return Ok(cityPutDto);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            var city = await _cityService.GetCityByIdAsync(id);
+            if (city == null)
+                return NotFound(); //204
+
             await _cityService.DeleteCityAsync(id);
-            return NoContent();
+            return Ok($"The city {city.Name} (ID:{id}) has been deleted.");
         }
     }
 }

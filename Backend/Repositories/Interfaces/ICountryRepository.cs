@@ -9,6 +9,7 @@ namespace Repositories.Interfaces
 {
     public interface ICountryRepository : IRepository<Country>
     {
-        Task<Country?> GetByNameAsync(string name);
+        Task<List<Country?>> GetAllCountryAsync();
+        Task<Country?> GetCountryByIdAsync(int id);
     }
 }
