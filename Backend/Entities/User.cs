@@ -27,7 +27,7 @@ namespace Entities
         [StringLength(200)]
         public string? Address { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal? Budget { get; set; }
+        public decimal Budget { get; set; }
         public bool IsPremium { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<Trip> Trips { get; set; }

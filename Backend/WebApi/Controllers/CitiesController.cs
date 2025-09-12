@@ -25,33 +25,16 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAll()
         {
             var cities = await _cityService.GetAllCitiesAsync();    
-                
-            var cityDtos = cities.Select(c => new CityDto
-            {
-                Id = c.Id,
-                Name = c.Name,
-                CountryId = c.CountryId,
-                CountryName = c.CountryName
-            }).ToList();
-
-            return Ok(cityDtos);
+            return Ok(cities);
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var city = await _cityService.GetCityByIdAsync(id);
-            if (city == null) return NotFound();
-
-            var cityDto = new CityDto
-            {
-                Id = city.Id,
-                Name = city.Name,
-                CountryId = city.CountryId,
-                CountryName = city.CountryName
-            };
-
-            return Ok(cityDto);
+            if (city == null)
+                return NotFound();
+            return Ok(city);
         }
 
         [HttpPost]

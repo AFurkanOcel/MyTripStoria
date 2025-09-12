@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contracts.UserDtos;
 using Entities;
 
 namespace Services.Interfaces
 {
     public interface IUserService
     {
-        Task<List<User>> GetAllUsersAsync();
-        Task<User> GetUserByIdAsync(int userId);
-        Task<User> GetUserByUsernameAsync(string username);
-        Task<User> GetUserByEmailAsync(string email);
+        Task<List<UserDto>> GetAllUsersAsync();
+        Task<UserDto> GetUserByIdAsync(int userId);
+        Task<UserDto> GetUserByUsernameAsync(string username);
+        Task<UserDto> GetUserByEmailAsync(string email);
         Task AddUserAsync(User user);
         Task<User> UpdateUserAsync(User user);
         Task DeleteUserAsync(int userId);

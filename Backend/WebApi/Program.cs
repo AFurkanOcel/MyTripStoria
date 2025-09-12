@@ -9,7 +9,12 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Authorise (email:Admin@Gmail.com  password:Admim_1234)
+/*
+{
+  "email": "L@gmail.com",
+  "password": "LLll0."
+}
+*/
 builder.Services.AddDbContext<AuthDbContext>(options =>
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

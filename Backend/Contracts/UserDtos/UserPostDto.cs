@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Contracts.UserDtos
 {
-    public class UserDto
+    public class UserPostDto
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
         public string Email { get; set; }
@@ -16,8 +15,6 @@ namespace Contracts.UserDtos
         public int Age { get; set; }
         public int CountryId { get; set; }
         public int CityId { get; set; }
-        public string CountryName { get; set; }
-        public string CityName { get; set; }
         public string Address { get; set; }
         public decimal Budget { get; set; }
         public bool IsPremium { get; set; }
