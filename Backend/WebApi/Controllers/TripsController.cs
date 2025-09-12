@@ -1,6 +1,9 @@
-﻿using Entities;
+﻿using Contracts.TripDtos;
+using Contracts.UserDtos;
+using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.Implementations;
 using Services.Interfaces;
 
 namespace WebApi.Controllers
@@ -28,21 +31,58 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var trip = await _tripService.GetTripByIdAsync(id);
-            if (trip == null) return NotFound();
+            if (trip == null)
+                return NotFound();
             return Ok(trip);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Trip trip)
+        [HttpGet("by-user/{userId}")]
+        public async Task<IActionResult> GetByUserId(int userId)
         {
+            var trips = await _tripService.GetTripsByUserIdAsync(userId);
+            return Ok(trips);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] TripPostDto tripPostDto)
+        {
+            // DTO -> Entity
+            var trip = new Trip
+            {
+                UserID = tripPostDto.UserId,
+                IsCompleted = tripPostDto.IsCompleted,
+                Title = tripPostDto.Title,
+                Description = tripPostDto.Description,
+                TripType = tripPostDto.TripType,
+                CountryId = tripPostDto.CountryId,
+                CityId = tripPostDto.CityId,
+                StartDate = tripPostDto.StartDate,
+                EndDate = tripPostDto.EndDate,
+                Notes = tripPostDto.Notes,
+            };
             await _tripService.AddTripAsync(trip);
-            return CreatedAtAction(nameof(GetById), new { id = trip.TripID }, trip);
+            return CreatedAtAction(nameof(GetById), new { id = trip.UserID }, tripPostDto);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Trip trip)
+        public async Task<IActionResult> Update(int id, [FromBody] TripPutDto tripPutDto)
         {
-            if (id != trip.TripID) return BadRequest();
+            // DTO -> Entity
+            var trip = new Trip
+            {
+                TripID = id,
+                UserID = tripPutDto.UserId,
+                IsCompleted = tripPutDto.IsCompleted,
+                Title = tripPutDto.Title,
+                Description = tripPutDto.Description,
+                TripType = tripPutDto.TripType,
+                CountryId = tripPutDto.CountryId,
+                CityId = tripPutDto.CityId,
+                StartDate = tripPutDto.StartDate,
+                EndDate = tripPutDto.EndDate,
+                Notes = tripPutDto.Notes,
+            };
+
             var updatedTrip = await _tripService.UpdateTripAsync(trip);
             return Ok(updatedTrip);
         }
@@ -50,8 +90,12 @@ namespace WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
+            var trip = await _tripService.GetTripByIdAsync(id);
+            if (trip == null)
+                return NotFound(); //204
+
             await _tripService.DeleteTripAsync(id);
-            return NoContent();
+            return Ok($"The Trip '{trip.Title}' (ID:{id}) has been deleted.");
         }
     }
 }

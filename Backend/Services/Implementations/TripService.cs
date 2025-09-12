@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contracts.TripDtos;
+using Contracts.UserDtos;
 using Entities;
+using Repositories.Implementations;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
@@ -18,19 +21,73 @@ namespace Services.Implementations
             _tripRepository = tripRepository;
         }
 
-        public async Task<List<Trip>> GetAllTripsAsync()
+        public async Task<List<TripDto>> GetAllTripsAsync()
         {
-            return await _tripRepository.GetAllAsync();
+            var trips = await _tripRepository.GetAllAsync();
+
+            var tripDtos = new List<TripDto>();
+            foreach (var trip in trips)
+            {
+                tripDtos.Add(new TripDto
+                {
+                    TripID = trip.TripID,
+                    IsCompleted = trip.IsCompleted,
+                    Title = trip.Title,
+                    Description = trip.Description,
+                    TripType = trip.TripType,
+                    CountryId = trip.CountryId,
+                    CityId = trip.CityId,
+                    StartDate = trip.StartDate,
+                    EndDate = trip.EndDate,
+                    Notes = trip.Notes,
+                    UserId = trip.UserID
+                });
+            }
+            return tripDtos;
         }
 
-        public async Task<Trip> GetTripByIdAsync(int tripId)
+        public async Task<TripDto> GetTripByIdAsync(int tripId)
         {
-            return await _tripRepository.GetByIdAsync(tripId);
+            var trip = await _tripRepository.GetByIdAsync(tripId);
+            if (trip == null)
+                return null;
+
+            return new TripDto
+            {
+                TripID = trip.TripID,
+                IsCompleted = trip.IsCompleted,
+                Title = trip.Title,
+                Description = trip.Description,
+                TripType = trip.TripType,
+                CountryId = trip.CountryId,
+                CityId = trip.CityId,
+                StartDate = trip.StartDate,
+                EndDate = trip.EndDate,
+                Notes = trip.Notes,
+                UserId = trip.UserID
+            };
         }
 
-        public async Task<List<Trip>> GetTripsByUserIdAsync(int userId)
+        public async Task<List<TripDto>> GetTripsByUserIdAsync(int userId)
         {
-            return await _tripRepository.GetAllByUserIdAsync(userId);
+            var trips = await _tripRepository.FindAsync(t => t.UserID == userId);
+
+            var tripDtos = trips.Select(trip => new TripDto
+            {
+                UserId = trip.UserID,
+                TripID = trip.TripID,
+                IsCompleted = trip.IsCompleted,
+                Title = trip.Title,
+                Description = trip.Description,
+                TripType = trip.TripType,
+                CountryId = trip.CountryId,
+                CityId = trip.CityId,
+                StartDate = trip.StartDate,
+                EndDate = trip.EndDate,
+                Notes = trip.Notes,
+            }).ToList();
+
+            return tripDtos;
         }
 
         public async Task AddTripAsync(Trip trip)
