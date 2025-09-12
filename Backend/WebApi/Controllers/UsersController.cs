@@ -22,14 +22,14 @@ namespace WebApi.Controllers
             _userService = userService;
         }
 
-        [HttpGet] //tamam ama country ve city name null dönüyo şuan, ıd ye göre çekemiyo.
+        [HttpGet]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
         }
 
-        [HttpGet("{id}")] //tamam ama country ve city name null dönüyo şuan, ıd ye göre çekemiyo.
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
@@ -38,7 +38,7 @@ namespace WebApi.Controllers
             return Ok(user);
         }
 
-        [HttpGet("by-username/{username}")] //tamam ama country ve city name null dönüyo şuan, ıd ye göre çekemiyo.
+        [HttpGet("by-username/{username}")]
         public async Task<IActionResult> GetByUsername(string username)
         {
             var user = await _userService.GetUserByUsernameAsync(username);
@@ -47,7 +47,7 @@ namespace WebApi.Controllers
             return Ok(user);
         }
 
-        [HttpGet("by-email/{email}")] //tamam ama country ve city name null dönüyo şuan, ıd ye göre çekemiyo.
+        [HttpGet("by-email/{email}")]
         public async Task<IActionResult> GetByEmail(string email)
         {
             var user = await _userService.GetUserByEmailAsync(email);
@@ -56,7 +56,7 @@ namespace WebApi.Controllers
             return Ok(user);
         }
 
-        [HttpPost] //tamam ama country ve cityi ıd ile ekliyoruz, isim daha uygun olabilir
+        [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserPostDto userPostDto)
         {
             // DTO -> Entity
@@ -77,7 +77,7 @@ namespace WebApi.Controllers
             return CreatedAtAction(nameof(GetById), new { id = user.UserID }, userPostDto);
         }
 
-        [HttpPut("{id}")] //tamam
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserPutDto userPutDto)
         {
             // DTO -> Entity
@@ -100,7 +100,7 @@ namespace WebApi.Controllers
             return Ok(updatedUser);
         }
 
-        [HttpDelete("{id}")] //tamam
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
