@@ -6,6 +6,7 @@ using Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -76,6 +77,14 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
+
+//logging
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 var app = builder.Build();
 
