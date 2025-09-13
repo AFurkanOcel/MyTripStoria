@@ -52,6 +52,10 @@ namespace Services.Implementations
             };
         }
 
+        public async Task<Country?> GetCountryByNameAsync(string name)
+        {
+            return await _countryRepository.GetByNameAsync(name);
+        }
 
         public async Task AddCountryAsync(Country country)
         {

@@ -12,6 +12,7 @@ namespace Services.Interfaces
     {
         Task<List<CityDto>> GetAllCitiesAsync();
         Task<CityDto> GetCityByIdAsync(int cityId);
+        Task<City?> GetCityByNameAsync(string name);
         Task AddCityAsync(City city);
         Task<City> UpdateCityAsync(City city);
         Task DeleteCityAsync(int cityId);

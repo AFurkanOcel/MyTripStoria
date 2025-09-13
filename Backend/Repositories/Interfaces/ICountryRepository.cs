@@ -11,5 +11,6 @@ namespace Repositories.Interfaces
     {
         Task<List<Country?>> GetAllCountryAsync();
         Task<Country?> GetCountryByIdAsync(int id);
+        Task<Country?> GetByNameAsync(string name);
     }
 }

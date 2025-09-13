@@ -27,6 +27,12 @@ namespace Repositories.Implementations
                                  .Include(c => c.Cities)
                                  .FirstOrDefaultAsync(c => c.Id == id);
         }
+
+        public async Task<Country?> GetByNameAsync(string name)
+        {
+            return await _context.Countries
+                                 .FirstOrDefaultAsync(c => c.Name == name);
+        }
     }
 }
 

@@ -32,7 +32,7 @@ namespace WebApi.Controllers
         {
             var trip = await _tripService.GetTripByIdAsync(id);
             if (trip == null)
-                return NotFound();
+                return NotFound($"The trip with ID {id} was not found.");
             return Ok(trip);
         }
 
@@ -40,6 +40,8 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetByUserId(int userId)
         {
             var trips = await _tripService.GetTripsByUserIdAsync(userId);
+            if (trips == null)
+                return NotFound($"There is no trip record for the user with ID {userId}.") ;
             return Ok(trips);
         }
 
@@ -67,6 +69,10 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] TripPutDto tripPutDto)
         {
+            var tripForControl = await _tripService.GetTripByIdAsync(id);
+            if (tripForControl == null)
+                return NotFound($"The trip with ID {id} was not found.");
+
             // DTO -> Entity
             var trip = new Trip
             {
@@ -92,7 +98,7 @@ namespace WebApi.Controllers
         {
             var trip = await _tripService.GetTripByIdAsync(id);
             if (trip == null)
-                return NotFound(); //204
+                return NotFound($"The trip with ID {id} was not found.");
 
             await _tripService.DeleteTripAsync(id);
             return Ok($"The Trip '{trip.Title}' (ID:{id}) has been deleted.");

@@ -34,7 +34,7 @@ namespace WebApi.Controllers
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
-                return NotFound();
+                return NotFound($"The user with ID {id} was not found.");
             return Ok(user);
         }
 
@@ -43,7 +43,7 @@ namespace WebApi.Controllers
         {
             var user = await _userService.GetUserByUsernameAsync(username);
             if (user == null)
-                return NotFound();
+                return NotFound($"The user with Username:'{username}' was not found.");
             return Ok(user);
         }
 
@@ -52,7 +52,7 @@ namespace WebApi.Controllers
         {
             var user = await _userService.GetUserByEmailAsync(email);
             if (user == null)
-                return NotFound();
+                return NotFound($"The user with Email:'{email}' was not found.");
             return Ok(user);
         }
 
@@ -73,6 +73,15 @@ namespace WebApi.Controllers
                 Budget = userPostDto.Budget,
                 IsPremium = userPostDto.IsPremium
             };
+
+            var userForUsernameControl = await _userService.GetUserByUsernameAsync(userPostDto.Username);
+            if (userForUsernameControl != null)
+                return Conflict($"A user with the same Username:'{userPostDto.Username}' already exists.");
+
+            var userForEmailControl = await _userService.GetUserByEmailAsync(userPostDto.Email);
+            if (userForEmailControl != null)
+                return Conflict($"A user with the same Email:'{userPostDto.Email}' already exists.");
+
             await _userService.AddUserAsync(user);
             return CreatedAtAction(nameof(GetById), new { id = user.UserID }, userPostDto);
         }
@@ -80,6 +89,10 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UserPutDto userPutDto)
         {
+            var userForControl = await _userService.GetUserByIdAsync(id);
+            if (userForControl == null)
+                return NotFound($"The user with ID {id} was not found.");
+
             // DTO -> Entity
             var user = new User
             {
@@ -96,6 +109,14 @@ namespace WebApi.Controllers
                 IsPremium = userPutDto.IsPremium
             };
 
+            var userForUsernameControl = await _userService.GetUserByUsernameAsync(userPutDto.Username);
+            if (userForUsernameControl != null)
+                return Conflict($"A user with the same Username:'{userPutDto.Username}' already exists.");
+
+            var userForEmailControl = await _userService.GetUserByEmailAsync(userPutDto.Email);
+            if (userForEmailControl != null)
+                return Conflict($"A user with the same Email:'{userPutDto.Email}' already exists.");
+
             var updatedUser = await _userService.UpdateUserAsync(user);
             return Ok(updatedUser);
         }
@@ -105,7 +126,7 @@ namespace WebApi.Controllers
         {
             var user = await _userService.GetUserByIdAsync(id);
             if (user == null)
-                return NotFound(); //204
+                return NotFound($"The user with ID {id} was not found.");
 
             await _userService.DeleteUserAsync(id);
             return Ok($"The user {user.Username} (ID:{id}) has been deleted.");

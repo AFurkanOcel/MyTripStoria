@@ -57,6 +57,10 @@ namespace Services.Implementations
             };
         }
 
+        public async Task<City?> GetCityByNameAsync(string name)
+        {
+            return await _cityRepository.GetByNameAsync(name);
+        }
 
         public async Task AddCityAsync(City city)
         {

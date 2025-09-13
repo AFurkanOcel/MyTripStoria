@@ -11,6 +11,7 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 /*
+Example an user:
 {
   "email": "L@gmail.com",
   "password": "LLll0."
