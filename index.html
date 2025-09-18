@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <title>Frontend Test</title>
+</head>
+<body>
+    <h1>API’den Gelen Veri</h1>
+    <pre id="output"></pre>
+
+    <script>
+    async function getData() {
+      try {
+          const token = "CfDJ8I7wIgPLsqBLgOLhAW_ufiVEGvnOMa_sh83uoF27Zpo0S0jJE_HRVgh6lUJzm2n4olFol7qcQlb94kS0277jTGo83DA4ZMFzkHPFzPUMDwqAy-0CP1PmVMHZSAu7luBm8zX9X6QB4dWRoPDAADB9VupEE4oR_I-8BO7E8IV8LCfvursFU3zaMHRDC45YF8bYjx-eUaxIJLHk5W4az49c7_6H4wOWV3AzHATQ3afn6P21aV500iKBl2m9CJfKN0z-oiRCSH58MgeVFqvmYr12SYD2jXlFwAgfzT8bVqeIVw9gLzI4OBv2MllVs9CtT71G2ms6NudrN3Dles_oN7lDmxPxih15aImGuxLfu0GGXxF_NkhGCVsJ-rNO3o8KVvy3bo4PCgibfM8BkYNL07FwEJxUAO4WxxUL7gvF7-LYUnZESh675IIxaXMZT-8dpy5WpioIap5WM6o3F2JSgYqp0IRYvr0uclbV_0HbbCCR60eSinN2XQOlJQm-N5miRy2hs7dfdjQxZCS3jYcQDjA8MkSLWjcwLxh2-RCg7OtNN3WhlBz1I0afAbNclnEwbIhMZnlScIKGMrWjqGLXOdijn5Jl8I_VEtvtJbsjK5NdQ_vUHC9ais-hnkFYAxhMbAiNnwnR6rTcn8qNhkpiR3AYWGiyKJmNEBbWpcgDImWIcNu-pyZZObSwXRVdRHmSeVX56w";
+          const response = await fetch("https://localhost:7160/api/Cities", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!response.ok) throw new Error("API çağrısı başarısız oldu");
+
+        const data = await response.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("output").textContent = err.message;
+      }
+    }
+
+    getData();
+    </script>
+</body>
+</html>
