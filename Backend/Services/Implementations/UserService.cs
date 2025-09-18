@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Contracts.CityDtos;
-using Contracts.UserDtos;
+﻿using Contracts.UserDtos;
 using Entities;
-using Repositories.Implementations;
 using Repositories.Interfaces;
 using Services.Interfaces;
 

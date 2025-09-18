@@ -1,11 +1,7 @@
-﻿using System.Diagnostics.Metrics;
-using Contracts.CityDtos;
-using Contracts.CountryDtos;
-using Contracts.UserDtos;
+﻿using Contracts.UserDtos;
 using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Services.Implementations;
 using Services.Interfaces;
 
 namespace WebApi.Controllers

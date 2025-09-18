@@ -1,9 +1,7 @@
 ﻿using Contracts.TripDtos;
-using Contracts.UserDtos;
 using Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Services.Implementations;
 using Services.Interfaces;
 
 namespace WebApi.Controllers

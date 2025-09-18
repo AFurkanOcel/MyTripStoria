@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Contracts.TripDtos;
-using Contracts.UserDtos;
+﻿using Contracts.TripDtos;
 using Entities;
-using Repositories.Implementations;
 using Repositories.Interfaces;
 using Services.Interfaces;
 

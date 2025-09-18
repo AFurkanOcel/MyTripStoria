@@ -19,8 +19,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Backend\Contra
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTripStoria_Frontend", "Frontend\MyTripStoria_Frontend\MyTripStoria_Frontend.csproj", "{B622194F-C807-1962-0C06-B844152B4DA1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,10 +49,6 @@ Global
 		{52F80FD3-C12C-B79A-A6DA-D185EC49ACC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52F80FD3-C12C-B79A-A6DA-D185EC49ACC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52F80FD3-C12C-B79A-A6DA-D185EC49ACC2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B622194F-C807-1962-0C06-B844152B4DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B622194F-C807-1962-0C06-B844152B4DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B622194F-C807-1962-0C06-B844152B4DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B622194F-C807-1962-0C06-B844152B4DA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,7 +60,6 @@ Global
 		{8EC5A66D-7243-C7F2-823C-C11D674D2289} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
 		{EDED4C77-6C7F-193E-62F5-8F602252CD09} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
 		{52F80FD3-C12C-B79A-A6DA-D185EC49ACC2} = {62157606-20CA-4A41-8B53-41E8D9F041F5}
-		{B622194F-C807-1962-0C06-B844152B4DA1} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {51FC89CF-46AE-4D07-BA78-1188CDE7430F}
