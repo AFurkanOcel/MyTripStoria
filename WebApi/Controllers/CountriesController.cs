@@ -40,7 +40,9 @@ namespace WebApi.Controllers
             // DTO -> Entity
             var country = new Country
             {
-                Name = countryPostDto.Name
+                Name = countryPostDto.Name,
+                Latitude = countryPostDto.Latitude,
+                Longitude = countryPostDto.Longitude
             };
 
             var countryForNameControl = await _countryService.GetCountryByNameAsync(countryPostDto.Name);
@@ -63,10 +65,12 @@ namespace WebApi.Controllers
             {
                 Id = id,
                 Name = countryPutDto.Name,
+                Latitude = countryPutDto.Latitude,
+                Longitude = countryPutDto.Longitude
             };
 
             var countryForNameControl = await _countryService.GetCountryByNameAsync(countryPutDto.Name);
-            if (countryForNameControl != null)
+            if (countryForNameControl != null && countryForNameControl.Id != id)
                 return Conflict($"A country with the name:'{countryPutDto.Name}' already exists.");
 
             var updatedCountry = await _countryService.UpdateCountryAsync(country);

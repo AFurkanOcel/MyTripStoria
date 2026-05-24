@@ -7,14 +7,9 @@ namespace Repositories.Implementations
 {
     public class CountryRepository : Repository<Country>, ICountryRepository
     {
-        private readonly AppDbContext _context;
+        public CountryRepository(AppDbContext context) : base(context) { }
 
-        public CountryRepository(AppDbContext context) : base(context)
-        {
-            _context = context;
-        }
-
-        public async Task<List<Country?>> GetAllCountryAsync()
+        public async Task<List<Country>> GetAllCountryAsync()
         {
             return await _context.Countries
                                  .Include(c => c.Cities)

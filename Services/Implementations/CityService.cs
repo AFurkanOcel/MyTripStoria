@@ -30,14 +30,16 @@ namespace Services.Implementations
                     Id = city.Id,
                     Name = city.Name,
                     CountryId = city.CountryId,
-                    CountryName = country?.Name
+                    CountryName = country?.Name,
+                    Latitude = city.Latitude,
+                    Longitude = city.Longitude
                 });
             }
 
             return cityDtos;
         }
 
-        public async Task<CityDto> GetCityByIdAsync(int cityId)
+        public async Task<CityDto?> GetCityByIdAsync(int cityId)
         {
             var city = await _cityRepository.GetByIdAsync(cityId);
             if (city == null)
@@ -50,7 +52,9 @@ namespace Services.Implementations
                 Id = city.Id,
                 Name = city.Name,
                 CountryId = city.CountryId,
-                CountryName = country?.Name
+                CountryName = country?.Name,
+                Latitude = city.Latitude,
+                Longitude = city.Longitude
             };
         }
 

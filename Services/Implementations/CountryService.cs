@@ -23,10 +23,14 @@ namespace Services.Implementations
             {
                 Id = c.Id,
                 Name = c.Name,
+                Latitude = c.Latitude,
+                Longitude = c.Longitude,
                 Cities = c.Cities.Select(city => new CityForCountryDto
                 {
                     Id = city.Id,
                     Name = city.Name,
+                    Latitude = city.Latitude,
+                    Longitude = city.Longitude,
                 }).ToList()
             }).ToList();
         }
@@ -40,10 +44,14 @@ namespace Services.Implementations
             {
                 Id = country.Id,
                 Name = country.Name,
+                Latitude = country.Latitude,
+                Longitude = country.Longitude,
                 Cities = country.Cities.Select(city => new CityForCountryDto
                 {
                     Id = city.Id,
                     Name = city.Name,
+                    Latitude = city.Latitude,
+                    Longitude = city.Longitude,
                 }).ToList()
             };
         }

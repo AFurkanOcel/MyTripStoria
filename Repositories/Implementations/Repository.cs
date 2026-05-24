@@ -37,25 +37,17 @@ namespace Repositories.Implementations
             return await _dbSet.Where(predicate).ToListAsync();
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public virtual async Task<List<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T?> GetByIdAsync(int id)
         {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity != null)
-            {
-                return entity;
-            }
-            else
-            {
-                throw new KeyNotFoundException($"Entity with id {id} not found.");
-            }
+            return await _dbSet.FindAsync(id);
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public virtual async Task<T> UpdateAsync(T entity)
         {
             _dbSet.Update(entity);
             await _context.SaveChangesAsync();

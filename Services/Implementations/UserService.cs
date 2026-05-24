@@ -1,4 +1,4 @@
-﻿using Contracts.UserDtos;
+using Contracts.UserDtos;
 using Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
@@ -21,113 +21,43 @@ namespace Services.Implementations
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
             var users = await _userRepository.GetAllAsync();
-
             var userDtos = new List<UserDto>();
+
             foreach (var user in users)
             {
-                var country = await _countryRepository.GetByIdAsync(user.CountryId);
-                var city = await _cityRepository.GetByIdAsync(user.CityId);
-                userDtos.Add(new UserDto
-                {
-                    Id = user.UserID,
-                    Username = user.Username,
-                    Password = user.Password,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Age = user.Age,
-                    CountryId = user.CountryId,
-                    CityId = user.CityId,
-                    CountryName = country?.Name,
-                    CityName = city?.Name,
-                    Address = user.Address,
-                    Budget = user.Budget,
-                    IsPremium = user.IsPremium
-                });
+                userDtos.Add(await MapUserAsync(user));
             }
 
             return userDtos;
         }
 
-        public async Task<UserDto> GetUserByIdAsync(int userId)
+        public async Task<UserDto?> GetUserByIdAsync(int userId)
         {
             var user = await _userRepository.GetByIdAsync(userId);
-            var country = await _countryRepository.GetByIdAsync(user.CountryId);
-            var city = await _cityRepository.GetByIdAsync(user.CityId);
-            if (user == null)
-                return null;
-
-            return new UserDto
-            {
-                Id = user.UserID,
-                Username = user.Username,
-                Password = user.Password,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Age = user.Age,
-                CountryId = user.CountryId,
-                CityId = user.CityId,
-                CountryName = country?.Name,
-                CityName = city?.Name,
-                Address = user.Address,
-                Budget = user.Budget,
-                IsPremium = user.IsPremium
-            };
+            return user == null ? null : await MapUserAsync(user);
         }
 
-        public async Task<UserDto> GetUserByUsernameAsync(string username)
+        public async Task<UserDto?> GetUserByUsernameAsync(string username)
         {
             var user = await _userRepository.GetByUsernameAsync(username);
-            var country = await _countryRepository.GetByIdAsync(user.CountryId);
-            var city = await _cityRepository.GetByIdAsync(user.CityId);
-            if (user == null)
-                return null;
-
-            return new UserDto
-            {
-                Id = user.UserID,
-                Username = user.Username,
-                Password = user.Password,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Age = user.Age,
-                CountryId = user.CountryId,
-                CityId = user.CityId,
-                CountryName = country?.Name,
-                CityName = city?.Name,
-                Address = user.Address,
-                Budget = user.Budget,
-                IsPremium = user.IsPremium
-            };
+            return user == null ? null : await MapUserAsync(user);
         }
 
-        public async Task<UserDto> GetUserByEmailAsync(string email)
+        public async Task<UserDto?> GetUserByEmailAsync(string email)
         {
             var user = await _userRepository.GetByEmailAsync(email);
-            var country = await _countryRepository.GetByIdAsync(user.CountryId);
-            var city = await _cityRepository.GetByIdAsync(user.CityId);
-            if (user == null)
-                return null;
+            return user == null ? null : await MapUserAsync(user);
+        }
 
-            return new UserDto
-            {
-                Id = user.UserID,
-                Username = user.Username,
-                Password = user.Password,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Age = user.Age,
-                CountryId = user.CountryId,
-                CityId = user.CityId,
-                CountryName = country?.Name,
-                CityName = city?.Name,
-                Address = user.Address,
-                Budget = user.Budget,
-                IsPremium = user.IsPremium
-            };
+        public async Task<UserDto?> GetUserByIdentityUserIdAsync(string identityUserId)
+        {
+            var user = await _userRepository.GetByIdentityUserIdAsync(identityUserId);
+            return user == null ? null : await MapUserAsync(user);
         }
 
         public async Task AddUserAsync(User user)
         {
+            user.CreatedAt = DateTime.UtcNow;
             await _userRepository.AddAsync(user);
         }
 
@@ -140,6 +70,28 @@ namespace Services.Implementations
         {
             await _userRepository.DeleteAsync(userId);
         }
+
+        private async Task<UserDto> MapUserAsync(User user)
+        {
+            var country = await _countryRepository.GetByIdAsync(user.CountryId);
+            var city = await _cityRepository.GetByIdAsync(user.CityId);
+
+            return new UserDto
+            {
+                Id = user.UserID,
+                IdentityUserId = user.IdentityUserId,
+                Username = user.Username,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Age = user.Age,
+                CountryId = user.CountryId,
+                CityId = user.CityId,
+                CountryName = country?.Name,
+                CityName = city?.Name,
+                Address = user.Address,
+                Budget = user.Budget,
+                IsPremium = user.IsPremium
+            };
+        }
     }
 }
-

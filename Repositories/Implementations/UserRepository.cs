@@ -9,18 +9,25 @@ namespace Repositories.Implementations
     {
         public UserRepository(AppDbContext context) : base(context) { }
 
-        public async Task<User> GetByUsernameAsync(string username)
+        public async Task<User?> GetByUsernameAsync(string username)
         {
             return await _context.Users
                                  .Include(u => u.Trips)
                                  .FirstOrDefaultAsync(u => u.Username == username);
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email)
         {
             return await _context.Users
                                  .Include(u => u.Trips)
                                  .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User?> GetByIdentityUserIdAsync(string identityUserId)
+        {
+            return await _context.Users
+                                 .Include(u => u.Trips)
+                                 .FirstOrDefaultAsync(u => u.IdentityUserId == identityUserId);
         }
     }
 }

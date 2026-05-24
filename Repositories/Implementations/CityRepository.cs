@@ -13,6 +13,7 @@ namespace Repositories.Implementations
         {
             return await _context.Cities
                                  .Include(c => c.Country)
+                                 .Where(c => c.CountryId == countryId)
                                  .ToListAsync();
         }
 

@@ -9,6 +9,17 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+if (string.IsNullOrWhiteSpace(defaultConnection))
+{
+    defaultConnection = Environment.GetEnvironmentVariable("MYTRIPSTORIA_CONNECTION_STRING");
+}
+
+if (string.IsNullOrWhiteSpace(defaultConnection))
+{
+    throw new InvalidOperationException("DefaultConnection or MYTRIPSTORIA_CONNECTION_STRING must be configured.");
+}
 
 /*
 Example an user:
@@ -19,9 +30,10 @@ Example an user:
 */
 builder.Services.AddDbContext<AuthDbContext>(options =>
     {
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+        options.UseSqlServer(defaultConnection);
     });
 
+builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<AuthDbContext>();
 
@@ -31,7 +43,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000")
+            var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                          ?? new[] { "http://localhost:3000", "http://localhost:5173" };
+
+            policy.WithOrigins(origins)
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -39,7 +54,7 @@ builder.Services.AddCors(options =>
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(defaultConnection));
 
 // Repositories
 builder.Services.AddScoped<ITripRepository, TripRepository>();
@@ -62,7 +77,7 @@ builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo()
     {
-        Title = "My API", Version = "v1" 
+        Title = "MyTripStoria API", Version = "v1"
     });
 
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme

@@ -8,8 +8,10 @@ namespace Repositories.Context
         public AppDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-            optionsBuilder.UseSqlServer(
-                "Server=DESKTOP-624K52L;Database=MyTripStoriaDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true");
+            var connectionString = Environment.GetEnvironmentVariable("MYTRIPSTORIA_CONNECTION_STRING")
+                                   ?? "Server=DESKTOP-624K52L;Database=MyTripStoriaDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
+
+            optionsBuilder.UseSqlServer(connectionString);
 
             return new AppDbContext(optionsBuilder.Options);
         }

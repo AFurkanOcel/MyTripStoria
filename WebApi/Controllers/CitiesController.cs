@@ -43,7 +43,9 @@ namespace WebApi.Controllers
             var city = new City
             {
                 Name = cityPostDto.Name,
-                CountryId = cityPostDto.CountryId
+                CountryId = cityPostDto.CountryId,
+                Latitude = cityPostDto.Latitude,
+                Longitude = cityPostDto.Longitude
             };
 
             var cityForNameControl = await _cityService.GetCityByNameAsync(cityPostDto.Name);
@@ -71,10 +73,12 @@ namespace WebApi.Controllers
                 Id = id,
                 Name = cityPutDto.Name,
                 CountryId = cityPutDto.CountryId,
+                Latitude = cityPutDto.Latitude,
+                Longitude = cityPutDto.Longitude
             };
 
             var cityForNameControl = await _cityService.GetCityByNameAsync(cityPutDto.Name);
-            if (cityForNameControl != null)
+            if (cityForNameControl != null && cityForNameControl.Id != id)
                 return Conflict($"A city with the name:'{cityPutDto.Name}' already exists.");
 
             var country = await _countryService.GetCountryByIdAsync(cityPutDto.CountryId);
