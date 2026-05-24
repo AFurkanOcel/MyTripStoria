@@ -119,6 +119,8 @@ var app = builder.Build();
 app.Environment.WebRootPath ??= Path.Combine(app.Environment.ContentRootPath, "wwwroot");
 Directory.CreateDirectory(app.Environment.WebRootPath);
 
+await LocationSeedData.SeedAsync(app.Services);
+
 app.MapIdentityApi<IdentityUser>();
 
 if (app.Environment.IsDevelopment())

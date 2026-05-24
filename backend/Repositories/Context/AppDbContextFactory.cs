@@ -9,7 +9,7 @@ namespace Repositories.Context
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
             var connectionString = Environment.GetEnvironmentVariable("MYTRIPSTORIA_CONNECTION_STRING")
-                                   ?? "Server=DESKTOP-624K52L;Database=MyTripStoriaDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
+                                   ?? "Server=(localdb)\\MyTripStoriaLocalDb;Database=MyTripStoriaDb;Trusted_Connection=True;Encrypt=False;MultipleActiveResultSets=true";
 
             optionsBuilder.UseSqlServer(connectionString);
 

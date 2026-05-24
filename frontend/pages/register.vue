@@ -97,6 +97,25 @@ const form = reactive({
 
 const filteredCities = computed(() => cities.value.filter((city) => city.countryId === form.countryId))
 
+const getApiErrorMessage = (err: unknown) => {
+  const apiError = err as {
+    statusCode?: number
+    statusMessage?: string
+    data?: {
+      title?: string
+      detail?: string
+      errors?: Record<string, string[]>
+    }
+  }
+
+  if (apiError.data?.errors) {
+    const messages = Object.values(apiError.data.errors).flat()
+    if (messages.length) return messages.join(' ')
+  }
+
+  return apiError.data?.detail || apiError.data?.title || apiError.statusMessage || ''
+}
+
 watch(filteredCities, (items) => {
   if (items.length && !items.some((city) => city.id === form.cityId)) form.cityId = items[0].id
 })
@@ -117,7 +136,15 @@ const submit = async () => {
   loading.value = true
   error.value = ''
   try {
-    await api.registerIdentity(form.email, form.password)
+    try {
+      await api.registerIdentity(form.email, form.password)
+    } catch (registerError) {
+      const message = getApiErrorMessage(registerError).toLowerCase()
+      if (!message.includes('already') && !message.includes('taken')) {
+        throw registerError
+      }
+    }
+
     await api.login(form.email, form.password)
     await api.createProfile({
       username: form.username,
@@ -131,8 +158,11 @@ const submit = async () => {
       isPremium: form.isPremium
     })
     await navigateTo('/')
-  } catch {
-    error.value = 'Kayıt tamamlanamadı. Ülke/şehir ID veya hesap bilgilerini kontrol et.'
+  } catch (err) {
+    const message = getApiErrorMessage(err)
+    error.value = message
+      ? `Kayit tamamlanamadi: ${message}`
+      : 'Kayit tamamlanamadi. E-posta, sifre, kullanici adi veya ulke/sehir bilgisini kontrol et.'
   } finally {
     loading.value = false
   }
