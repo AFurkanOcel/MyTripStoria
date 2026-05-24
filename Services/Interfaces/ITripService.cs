@@ -16,5 +16,7 @@ namespace Services.Interfaces
         Task AddTripAsync(Trip trip);
         Task<Trip> UpdateTripAsync(Trip trip);
         Task DeleteTripAsync(int tripId);
+        Task<TripPhotoDto> AddPhotoAsync(int tripId, TripPhoto photo);
+        Task<TripPhotoDto?> DeletePhotoAsync(int tripId, int photoId);
     }
 }

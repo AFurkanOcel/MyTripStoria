@@ -12,21 +12,33 @@ namespace WebApi.Controllers
     [Authorize]
     public class TripsController : ControllerBase
     {
+        private const long MaxPhotoSizeInBytes = 5 * 1024 * 1024;
+        private static readonly HashSet<string> AllowedPhotoExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        };
+
         private readonly ITripService _tripService;
         private readonly IUserService _userService;
         private readonly ICountryService _countryService;
         private readonly ICityService _cityService;
+        private readonly IWebHostEnvironment _environment;
 
         public TripsController(
             ITripService tripService,
             IUserService userService,
             ICountryService countryService,
-            ICityService cityService)
+            ICityService cityService,
+            IWebHostEnvironment environment)
         {
             _tripService = tripService;
             _userService = userService;
             _countryService = countryService;
             _cityService = cityService;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -162,7 +174,12 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TripPostDto tripPostDto)
         {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
             var validationResult = await ValidateTripRequestAsync(
+                profile,
                 tripPostDto.UserId,
                 tripPostDto.CountryId,
                 tripPostDto.CityId,
@@ -189,7 +206,12 @@ namespace WebApi.Controllers
             if (!await CanAccessUserAsync(existingTrip.UserId))
                 return Forbid();
 
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
             var validationResult = await ValidateTripRequestAsync(
+                profile,
                 tripPutDto.UserId,
                 tripPutDto.CountryId,
                 tripPutDto.CityId,
@@ -208,6 +230,86 @@ namespace WebApi.Controllers
             return Ok(await _tripService.GetTripByIdAsync(updatedTrip.TripID));
         }
 
+        [HttpPost("{id}/photos")]
+        [RequestSizeLimit(MaxPhotoSizeInBytes)]
+        public async Task<IActionResult> UploadPhoto(
+            int id,
+            [FromForm] IFormFile file,
+            [FromForm] string? caption,
+            [FromForm] bool isCover = false,
+            [FromForm] DateTime? takenAt = null)
+        {
+            var trip = await _tripService.GetTripByIdAsync(id);
+            if (trip == null)
+                return NotFound($"The trip with ID {id} was not found.");
+
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            if (profile.Id != trip.UserId)
+                return Forbid();
+
+            if (!profile.IsPremium)
+                return StatusCode(StatusCodes.Status403Forbidden, "Photo upload is available for premium users.");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("A photo file is required.");
+
+            if (file.Length > MaxPhotoSizeInBytes)
+                return BadRequest("Photo size must be 5 MB or less.");
+
+            var extension = Path.GetExtension(file.FileName);
+            if (!AllowedPhotoExtensions.Contains(extension))
+                return BadRequest("Only JPG, PNG, and WEBP photos are supported.");
+
+            var uploadRoot = GetUploadRootPath();
+            var relativeFolder = Path.Combine("uploads", "trips", id.ToString());
+            var absoluteFolder = Path.Combine(uploadRoot, relativeFolder);
+            Directory.CreateDirectory(absoluteFolder);
+
+            var storedFileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+            var absolutePath = Path.Combine(absoluteFolder, storedFileName);
+
+            await using (var stream = System.IO.File.Create(absolutePath))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var photo = new TripPhoto
+            {
+                Url = "/" + Path.Combine(relativeFolder, storedFileName).Replace("\\", "/"),
+                OriginalFileName = Path.GetFileName(file.FileName),
+                ContentType = file.ContentType,
+                SizeInBytes = file.Length,
+                Caption = caption,
+                IsCover = isCover,
+                SortOrder = trip.Photos.Count,
+                TakenAt = takenAt
+            };
+
+            var savedPhoto = await _tripService.AddPhotoAsync(id, photo);
+            return CreatedAtAction(nameof(GetById), new { id }, savedPhoto);
+        }
+
+        [HttpDelete("{tripId}/photos/{photoId}")]
+        public async Task<IActionResult> DeletePhoto(int tripId, int photoId)
+        {
+            var trip = await _tripService.GetTripByIdAsync(tripId);
+            if (trip == null)
+                return NotFound($"The trip with ID {tripId} was not found.");
+
+            if (!await CanAccessUserAsync(trip.UserId))
+                return Forbid();
+
+            var deletedPhoto = await _tripService.DeletePhotoAsync(tripId, photoId);
+            if (deletedPhoto == null)
+                return NotFound($"The photo with ID {photoId} was not found.");
+
+            DeleteUploadedFileIfExists(deletedPhoto.Url);
+            return Ok(deletedPhoto);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -223,6 +325,7 @@ namespace WebApi.Controllers
         }
 
         private async Task<IActionResult?> ValidateTripRequestAsync(
+            Contracts.UserDtos.UserDto profile,
             int userId,
             int countryId,
             int cityId,
@@ -232,11 +335,14 @@ namespace WebApi.Controllers
             decimal? longitude,
             IReadOnlyCollection<TripPhotoDto>? photos)
         {
-            if (!await CanAccessUserAsync(userId))
+            if (profile.Id != userId)
                 return Forbid();
 
             if (endDate < startDate)
                 return BadRequest("EndDate must be greater than or equal to StartDate.");
+
+            if (!profile.IsPremium && photos?.Any() == true)
+                return StatusCode(StatusCodes.Status403Forbidden, "Trip photo metadata is available for premium users.");
 
             if (latitude.HasValue != longitude.HasValue)
                 return BadRequest("Latitude and Longitude must be provided together.");
@@ -357,6 +463,9 @@ namespace WebApi.Controllers
             {
                 Id = dto.Id,
                 Url = dto.Url,
+                OriginalFileName = dto.OriginalFileName,
+                ContentType = dto.ContentType,
+                SizeInBytes = dto.SizeInBytes,
                 Caption = dto.Caption,
                 IsCover = dto.IsCover,
                 SortOrder = dto.SortOrder,
@@ -379,6 +488,26 @@ namespace WebApi.Controllers
             return Enum.TryParse<TripVisibility>(visibility, true, out var parsedVisibility)
                 ? parsedVisibility
                 : TripVisibility.Private;
+        }
+
+        private string GetUploadRootPath()
+        {
+            if (!string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                return _environment.WebRootPath;
+
+            return Path.Combine(_environment.ContentRootPath, "wwwroot");
+        }
+
+        private void DeleteUploadedFileIfExists(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url) || !url.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var relativePath = url.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString());
+            var absolutePath = Path.Combine(GetUploadRootPath(), relativePath);
+
+            if (System.IO.File.Exists(absolutePath))
+                System.IO.File.Delete(absolutePath);
         }
     }
 }

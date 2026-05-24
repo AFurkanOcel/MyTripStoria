@@ -145,6 +145,18 @@ namespace Services.Implementations
             return await _tripRepository.UpdateAsync(trip);
         }
 
+        public async Task<TripPhotoDto> AddPhotoAsync(int tripId, TripPhoto photo)
+        {
+            var savedPhoto = await _tripRepository.AddPhotoAsync(tripId, photo);
+            return MapPhoto(savedPhoto);
+        }
+
+        public async Task<TripPhotoDto?> DeletePhotoAsync(int tripId, int photoId)
+        {
+            var deletedPhoto = await _tripRepository.DeletePhotoAsync(tripId, photoId);
+            return deletedPhoto == null ? null : MapPhoto(deletedPhoto);
+        }
+
         private static TripStatus NormalizeStatus(TripStatus status, bool isCompleted)
         {
             return isCompleted ? TripStatus.Completed : status;
@@ -194,16 +206,24 @@ namespace Services.Implementations
                     .ToList(),
                 Photos = trip.Photos
                     .OrderBy(p => p.SortOrder)
-                    .Select(p => new TripPhotoDto
-                    {
-                        Id = p.Id,
-                        Url = p.Url,
-                        Caption = p.Caption,
-                        IsCover = p.IsCover,
-                        SortOrder = p.SortOrder,
-                        TakenAt = p.TakenAt
-                    })
+                    .Select(MapPhoto)
                     .ToList()
+            };
+        }
+
+        private static TripPhotoDto MapPhoto(TripPhoto photo)
+        {
+            return new TripPhotoDto
+            {
+                Id = photo.Id,
+                Url = photo.Url,
+                OriginalFileName = photo.OriginalFileName,
+                ContentType = photo.ContentType,
+                SizeInBytes = photo.SizeInBytes,
+                Caption = photo.Caption,
+                IsCover = photo.IsCover,
+                SortOrder = photo.SortOrder,
+                TakenAt = photo.TakenAt
             };
         }
 

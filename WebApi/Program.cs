@@ -116,6 +116,9 @@ builder.Host.UseSerilog();
 
 var app = builder.Build();
 
+app.Environment.WebRootPath ??= Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(app.Environment.WebRootPath);
+
 app.MapIdentityApi<IdentityUser>();
 
 if (app.Environment.IsDevelopment())
@@ -125,6 +128,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseCors("AllowLocalhost");
 

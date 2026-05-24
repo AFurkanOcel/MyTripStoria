@@ -10,6 +10,11 @@ namespace Entities
         public Trip Trip { get; set; } = null!;
         [StringLength(500)]
         public string Url { get; set; } = string.Empty;
+        [StringLength(255)]
+        public string OriginalFileName { get; set; } = string.Empty;
+        [StringLength(100)]
+        public string ContentType { get; set; } = string.Empty;
+        public long SizeInBytes { get; set; }
         [StringLength(200)]
         public string? Caption { get; set; }
         public bool IsCover { get; set; }
