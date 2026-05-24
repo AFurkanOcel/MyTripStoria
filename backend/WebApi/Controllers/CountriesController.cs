@@ -19,6 +19,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             var countries = await _countryService.GetAllCountriesAsync();
@@ -26,6 +27,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var country = await _countryService.GetCountryByIdAsync(id);

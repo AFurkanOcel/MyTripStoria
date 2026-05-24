@@ -21,6 +21,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
             var cities = await _cityService.GetAllCitiesAsync();    
@@ -28,6 +29,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
             var city = await _cityService.GetCityByIdAsync(id);
