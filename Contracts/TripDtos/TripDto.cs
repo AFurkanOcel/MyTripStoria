@@ -28,5 +28,6 @@ namespace Contracts.TripDtos
         public TimeSpan TripDuration => EndDate - StartDate;
         public string? Notes { get; set; }
         public List<TripWaypointDto> Waypoints { get; set; } = new();
+        public List<TripPhotoDto> Photos { get; set; } = new();
     }
 }

@@ -8,10 +8,10 @@ namespace Contracts.TripDtos
         public int UserId { get; set; }
         public bool IsCompleted { get; set; }
         [Required]
-        [StringLength(50)]
+        [StringLength(120)]
         public string Title { get; set; } = string.Empty;
         [Required]
-        [StringLength(100)]
+        [StringLength(1000)]
         public string Description { get; set; } = string.Empty;
         [Required]
         [StringLength(50)]
@@ -43,5 +43,6 @@ namespace Contracts.TripDtos
         [StringLength(1000)]
         public string? Notes { get; set; }
         public List<TripWaypointDto> Waypoints { get; set; } = new();
+        public List<TripPhotoDto> Photos { get; set; } = new();
     }
 }

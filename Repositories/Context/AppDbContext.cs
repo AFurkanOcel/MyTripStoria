@@ -10,6 +10,7 @@ namespace Repositories.Context
         public DbSet<User> Users { get; set; }
         public DbSet<Trip> Trips { get; set; }
         public DbSet<TripWaypoint> TripWaypoints { get; set; }
+        public DbSet<TripPhoto> TripPhotos { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<City> Cities { get; set; }
 
@@ -55,6 +56,12 @@ namespace Repositories.Context
                         .HasMany(t => t.Waypoints)
                         .WithOne(w => w.Trip)
                         .HasForeignKey(w => w.TripId)
+                        .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Trip>()
+                        .HasMany(t => t.Photos)
+                        .WithOne(p => p.Trip)
+                        .HasForeignKey(p => p.TripId)
                         .OnDelete(DeleteBehavior.Cascade);
 
             // User ↔ Country and City (FK)

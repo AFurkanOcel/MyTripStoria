@@ -55,6 +55,17 @@ namespace Services.Implementations
                 .ToList();
         }
 
+        public async Task<List<TripDto>> GetPlannedTripsByUserIdAsync(int userId)
+        {
+            var trips = await _tripRepository.GetAllByUserIdAsync(userId);
+
+            return trips
+                .Where(t => t.Status == TripStatus.Planned && !t.IsCompleted)
+                .OrderBy(t => t.StartDate)
+                .Select(MapTrip)
+                .ToList();
+        }
+
         public async Task<List<TripMapMarkerDto>> GetMapMarkersByUserIdAsync(int userId)
         {
             var trips = await _tripRepository.GetAllByUserIdAsync(userId);
@@ -67,6 +78,8 @@ namespace Services.Implementations
                     UserId = t.UserID,
                     Title = t.Title,
                     Status = t.Status.ToString(),
+                    MarkerType = GetMarkerType(t),
+                    MarkerColor = GetMarkerColor(t),
                     PlaceName = t.PlaceName,
                     CityName = t.City?.Name,
                     CountryName = t.Country?.Name,
@@ -95,7 +108,19 @@ namespace Services.Implementations
                 CancelledTrips = trips.Count(t => t.Status == TripStatus.Cancelled),
                 TotalPlannedBudget = trips.Sum(t => t.PlannedBudget ?? 0),
                 TotalActualCost = trips.Sum(t => t.ActualCost ?? 0),
-                NextTripStartDate = activeUpcomingTrips.FirstOrDefault()?.StartDate
+                NextTripStartDate = activeUpcomingTrips.FirstOrDefault()?.StartDate,
+                NextTripTitle = activeUpcomingTrips.FirstOrDefault()?.Title,
+                VisitedCountryCount = trips
+                    .Where(t => t.Status == TripStatus.Completed || t.IsCompleted)
+                    .Select(t => t.CountryId)
+                    .Distinct()
+                    .Count(),
+                VisitedCityCount = trips
+                    .Where(t => t.Status == TripStatus.Completed || t.IsCompleted)
+                    .Select(t => t.CityId)
+                    .Distinct()
+                    .Count(),
+                TotalTravelDays = trips.Sum(t => Math.Max(1, (t.EndDate.Date - t.StartDate.Date).Days + 1))
             };
         }
 
@@ -166,7 +191,37 @@ namespace Services.Implementations
                         PlannedAt = w.PlannedAt,
                         Notes = w.Notes
                     })
+                    .ToList(),
+                Photos = trip.Photos
+                    .OrderBy(p => p.SortOrder)
+                    .Select(p => new TripPhotoDto
+                    {
+                        Id = p.Id,
+                        Url = p.Url,
+                        Caption = p.Caption,
+                        IsCover = p.IsCover,
+                        SortOrder = p.SortOrder,
+                        TakenAt = p.TakenAt
+                    })
                     .ToList()
+            };
+        }
+
+        private static string GetMarkerType(Trip trip)
+        {
+            return trip.Status == TripStatus.Completed || trip.IsCompleted
+                ? "PastTrip"
+                : "PlannedTrip";
+        }
+
+        private static string GetMarkerColor(Trip trip)
+        {
+            return trip.Status switch
+            {
+                TripStatus.Completed => "#16A34A",
+                TripStatus.Ongoing => "#F59E0B",
+                TripStatus.Cancelled => "#6B7280",
+                _ => "#2563EB"
             };
         }
     }

@@ -40,6 +40,66 @@ namespace WebApi.Controllers
             return Ok(trips);
         }
 
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMine()
+        {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            return Ok(await _tripService.GetTripsByUserIdAsync(profile.Id));
+        }
+
+        [HttpGet("me/planned")]
+        public async Task<IActionResult> GetMyPlanned()
+        {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            return Ok(await _tripService.GetPlannedTripsByUserIdAsync(profile.Id));
+        }
+
+        [HttpGet("me/upcoming")]
+        public async Task<IActionResult> GetMyUpcoming()
+        {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            return Ok(await _tripService.GetUpcomingTripsByUserIdAsync(profile.Id));
+        }
+
+        [HttpGet("me/completed")]
+        public async Task<IActionResult> GetMyCompleted()
+        {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            return Ok(await _tripService.GetCompletedTripsByUserIdAsync(profile.Id));
+        }
+
+        [HttpGet("me/map-markers")]
+        public async Task<IActionResult> GetMyMapMarkers()
+        {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            return Ok(await _tripService.GetMapMarkersByUserIdAsync(profile.Id));
+        }
+
+        [HttpGet("me/summary")]
+        public async Task<IActionResult> GetMyDashboardSummary()
+        {
+            var profile = await GetCurrentProfileAsync();
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            return Ok(await _tripService.GetDashboardSummaryByUserIdAsync(profile.Id));
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -102,7 +162,15 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] TripPostDto tripPostDto)
         {
-            var validationResult = await ValidateTripRequestAsync(tripPostDto.UserId, tripPostDto.CountryId, tripPostDto.CityId, tripPostDto.StartDate, tripPostDto.EndDate);
+            var validationResult = await ValidateTripRequestAsync(
+                tripPostDto.UserId,
+                tripPostDto.CountryId,
+                tripPostDto.CityId,
+                tripPostDto.StartDate,
+                tripPostDto.EndDate,
+                tripPostDto.Latitude,
+                tripPostDto.Longitude,
+                tripPostDto.Photos);
             if (validationResult != null)
                 return validationResult;
 
@@ -121,7 +189,15 @@ namespace WebApi.Controllers
             if (!await CanAccessUserAsync(existingTrip.UserId))
                 return Forbid();
 
-            var validationResult = await ValidateTripRequestAsync(tripPutDto.UserId, tripPutDto.CountryId, tripPutDto.CityId, tripPutDto.StartDate, tripPutDto.EndDate);
+            var validationResult = await ValidateTripRequestAsync(
+                tripPutDto.UserId,
+                tripPutDto.CountryId,
+                tripPutDto.CityId,
+                tripPutDto.StartDate,
+                tripPutDto.EndDate,
+                tripPutDto.Latitude,
+                tripPutDto.Longitude,
+                tripPutDto.Photos);
             if (validationResult != null)
                 return validationResult;
 
@@ -146,13 +222,27 @@ namespace WebApi.Controllers
             return Ok($"The Trip '{trip.Title}' (ID:{id}) has been deleted.");
         }
 
-        private async Task<IActionResult?> ValidateTripRequestAsync(int userId, int countryId, int cityId, DateTime startDate, DateTime endDate)
+        private async Task<IActionResult?> ValidateTripRequestAsync(
+            int userId,
+            int countryId,
+            int cityId,
+            DateTime startDate,
+            DateTime endDate,
+            decimal? latitude,
+            decimal? longitude,
+            IReadOnlyCollection<TripPhotoDto>? photos)
         {
             if (!await CanAccessUserAsync(userId))
                 return Forbid();
 
             if (endDate < startDate)
                 return BadRequest("EndDate must be greater than or equal to StartDate.");
+
+            if (latitude.HasValue != longitude.HasValue)
+                return BadRequest("Latitude and Longitude must be provided together.");
+
+            if (photos?.Count(p => p.IsCover) > 1)
+                return BadRequest("Only one photo can be marked as cover.");
 
             var country = await _countryService.GetCountryByIdAsync(countryId);
             if (country == null)
@@ -211,7 +301,8 @@ namespace WebApi.Controllers
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 Notes = dto.Notes,
-                Waypoints = dto.Waypoints.Select(MapWaypoint).ToList()
+                Waypoints = (dto.Waypoints ?? new()).Select(MapWaypoint).ToList(),
+                Photos = (dto.Photos ?? new()).Select(MapPhoto).ToList()
             };
         }
 
@@ -240,7 +331,8 @@ namespace WebApi.Controllers
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 Notes = dto.Notes,
-                Waypoints = dto.Waypoints.Select(MapWaypoint).ToList()
+                Waypoints = (dto.Waypoints ?? new()).Select(MapWaypoint).ToList(),
+                Photos = (dto.Photos ?? new()).Select(MapPhoto).ToList()
             };
         }
 
@@ -256,6 +348,19 @@ namespace WebApi.Controllers
                 SortOrder = dto.SortOrder,
                 PlannedAt = dto.PlannedAt,
                 Notes = dto.Notes
+            };
+        }
+
+        private static TripPhoto MapPhoto(TripPhotoDto dto)
+        {
+            return new TripPhoto
+            {
+                Id = dto.Id,
+                Url = dto.Url,
+                Caption = dto.Caption,
+                IsCover = dto.IsCover,
+                SortOrder = dto.SortOrder,
+                TakenAt = dto.TakenAt
             };
         }
 

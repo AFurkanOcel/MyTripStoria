@@ -13,9 +13,9 @@ namespace Entities
         public TripStatus Status { get; set; } = TripStatus.Planned;
         public TripVisibility Visibility { get; set; } = TripVisibility.Private;
         public string TripType { get; set; } = string.Empty;
-        [StringLength(50)]
+        [StringLength(120)]
         public string Title { get; set; } = string.Empty;
-        [StringLength(100)]
+        [StringLength(1000)]
         public string Description { get; set; } = string.Empty;
         public int CountryId { get; set; }
         public Country Country { get; set; } = null!;
@@ -47,5 +47,6 @@ namespace Entities
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public ICollection<TripWaypoint> Waypoints { get; set; } = new List<TripWaypoint>();
+        public ICollection<TripPhoto> Photos { get; set; } = new List<TripPhoto>();
     }
 }

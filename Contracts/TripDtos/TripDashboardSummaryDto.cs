@@ -10,5 +10,9 @@ namespace Contracts.TripDtos
         public decimal TotalPlannedBudget { get; set; }
         public decimal TotalActualCost { get; set; }
         public DateTime? NextTripStartDate { get; set; }
+        public string? NextTripTitle { get; set; }
+        public int VisitedCountryCount { get; set; }
+        public int VisitedCityCount { get; set; }
+        public int TotalTravelDays { get; set; }
     }
 }

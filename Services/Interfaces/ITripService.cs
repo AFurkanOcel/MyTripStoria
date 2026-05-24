@@ -10,6 +10,7 @@ namespace Services.Interfaces
         Task<List<TripDto>> GetTripsByUserIdAsync(int userId);
         Task<List<TripDto>> GetUpcomingTripsByUserIdAsync(int userId);
         Task<List<TripDto>> GetCompletedTripsByUserIdAsync(int userId);
+        Task<List<TripDto>> GetPlannedTripsByUserIdAsync(int userId);
         Task<List<TripMapMarkerDto>> GetMapMarkersByUserIdAsync(int userId);
         Task<TripDashboardSummaryDto> GetDashboardSummaryByUserIdAsync(int userId);
         Task AddTripAsync(Trip trip);

@@ -15,6 +15,7 @@ namespace Repositories.Implementations
                                  .Include(t => t.City)
                                  .Include(t => t.Country)
                                  .Include(t => t.Waypoints)
+                                 .Include(t => t.Photos)
                                  .ToListAsync();
         }
 
@@ -24,6 +25,7 @@ namespace Repositories.Implementations
                                  .Include(t => t.City)
                                  .Include(t => t.Country)
                                  .Include(t => t.Waypoints)
+                                 .Include(t => t.Photos)
                                  .Where(t => t.UserID == userId)
                                  .ToListAsync();
         }
@@ -34,6 +36,7 @@ namespace Repositories.Implementations
                                  .Include(t => t.City)
                                  .Include(t => t.Country)
                                  .Include(t => t.Waypoints)
+                                 .Include(t => t.Photos)
                                  .FirstOrDefaultAsync(t => t.TripID == tripId);
         }
 
@@ -41,6 +44,7 @@ namespace Repositories.Implementations
         {
             var existingTrip = await _context.Trips
                                              .Include(t => t.Waypoints)
+                                             .Include(t => t.Photos)
                                              .FirstOrDefaultAsync(t => t.TripID == trip.TripID);
 
             if (existingTrip == null)
@@ -48,7 +52,9 @@ namespace Repositories.Implementations
 
             _context.Entry(existingTrip).CurrentValues.SetValues(trip);
             _context.TripWaypoints.RemoveRange(existingTrip.Waypoints);
+            _context.TripPhotos.RemoveRange(existingTrip.Photos);
             existingTrip.Waypoints = trip.Waypoints;
+            existingTrip.Photos = trip.Photos;
 
             await _context.SaveChangesAsync();
             return existingTrip;

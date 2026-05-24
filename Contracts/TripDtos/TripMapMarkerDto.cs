@@ -6,6 +6,8 @@ namespace Contracts.TripDtos
         public int UserId { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
+        public string MarkerType { get; set; } = string.Empty;
+        public string MarkerColor { get; set; } = string.Empty;
         public string? PlaceName { get; set; }
         public string? CityName { get; set; }
         public string? CountryName { get; set; }
