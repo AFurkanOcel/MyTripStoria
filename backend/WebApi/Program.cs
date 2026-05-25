@@ -69,6 +69,10 @@ builder.Services.AddScoped<ITripService, TripService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICountryService, CountryService>();
 builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddHttpClient<LocationSyncService>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
 
 // Controllers
 builder.Services.AddControllers();
@@ -121,7 +125,10 @@ var app = builder.Build();
 app.Environment.WebRootPath ??= Path.Combine(app.Environment.ContentRootPath, "wwwroot");
 Directory.CreateDirectory(app.Environment.WebRootPath);
 
-await LocationSeedData.SeedAsync(app.Services);
+using (var locationScope = app.Services.CreateScope())
+{
+    await locationScope.ServiceProvider.GetRequiredService<LocationSyncService>().SyncAsync();
+}
 
 app.MapIdentityApi<IdentityUser>();
 
