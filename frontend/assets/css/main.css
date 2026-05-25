@@ -433,6 +433,17 @@ button {
   gap: 12px;
 }
 
+.trip-record {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.trip-card-link {
+  display: block;
+}
+
 .trip-card {
   padding: 14px;
 }
@@ -464,6 +475,53 @@ button {
   background: rgba(220, 38, 38, 0.08);
   color: var(--danger);
   font-weight: 800;
+}
+
+.trip-record > .icon-danger {
+  align-self: stretch;
+  min-width: 88px;
+}
+
+.file-picker {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px;
+}
+
+.file-picker input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.file-picker span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--surface-soft);
+  color: var(--text);
+  font-weight: 800;
+}
+
+.file-picker small {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .badge {
@@ -625,5 +683,10 @@ button {
   .topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .trip-record,
+  .file-picker {
+    grid-template-columns: 1fr;
   }
 }

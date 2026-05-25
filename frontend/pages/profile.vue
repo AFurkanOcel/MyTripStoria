@@ -16,7 +16,11 @@
 
         <label class="field">
           <span>Profile photo</span>
-          <input class="input" type="file" accept="image/png,image/jpeg,image/webp" @change="pickPhoto" />
+          <label class="file-picker">
+            <input type="file" accept="image/png,image/jpeg,image/webp" @change="pickPhoto" />
+            <span>Choose photo</span>
+            <small>{{ photoFile?.name || 'No file selected' }}</small>
+          </label>
         </label>
         <button class="btn btn-ghost" type="button" :disabled="photoUploading || !photoFile" @click="uploadPhoto">
           {{ photoUploading ? 'Uploading photo' : 'Upload photo' }}
@@ -121,8 +125,8 @@ const uploadPhoto = async () => {
     hydrate(updated)
     photoFile.value = null
     message.value = 'Profile photo updated.'
-  } catch {
-    error.value = 'Profile photo could not be uploaded.'
+  } catch (uploadError: any) {
+    error.value = getErrorMessage(uploadError, 'Profile photo could not be uploaded.')
   } finally {
     photoUploading.value = false
   }
@@ -137,10 +141,18 @@ const save = async () => {
     profile.value = updated
     hydrate(updated)
     message.value = 'Profile updated.'
-  } catch {
-    error.value = 'Profile could not be updated.'
+  } catch (saveError: any) {
+    error.value = getErrorMessage(saveError, 'Profile could not be updated.')
   } finally {
     saving.value = false
   }
+}
+
+const getErrorMessage = (apiError: any, fallback: string) => {
+  const data = apiError?.data
+  if (typeof data === 'string') return data
+  if (data?.title) return data.title
+  if (data?.errors) return Object.values(data.errors).flat().join(' ')
+  return fallback
 }
 </script>

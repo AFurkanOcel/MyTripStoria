@@ -1,11 +1,11 @@
 <template>
-  <NuxtLink class="trip-card" :to="`/trips/${trip.tripID}`">
+  <NuxtLink class="trip-card trip-card-link" :to="`/trips/${trip.tripID}`">
     <div class="actions" style="justify-content: space-between; margin-bottom: 10px;">
       <StatusBadge :status="trip.status" />
       <span style="color: var(--muted); font-size: 13px;">{{ dateRange }}</span>
     </div>
     <h3>{{ trip.title }}</h3>
-    <p>{{ trip.placeName || trip.cityName || 'No location selected' }} · {{ trip.countryName || 'No country selected' }}</p>
+    <p>{{ trip.placeName || trip.cityName || 'No location selected' }} - {{ trip.countryName || 'No country selected' }}</p>
   </NuxtLink>
 </template>
 

@@ -13,6 +13,7 @@ namespace WebApi.Controllers
     public class TripsController : ControllerBase
     {
         private const long MaxPhotoSizeInBytes = 5 * 1024 * 1024;
+        private const long MaxPhotoRequestSizeInBytes = 6 * 1024 * 1024;
         private static readonly HashSet<string> AllowedPhotoExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
             ".jpg",
@@ -231,7 +232,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("{id}/photos")]
-        [RequestSizeLimit(MaxPhotoSizeInBytes)]
+        [RequestSizeLimit(MaxPhotoRequestSizeInBytes)]
         public async Task<IActionResult> UploadPhoto(
             int id,
             [FromForm] IFormFile file,

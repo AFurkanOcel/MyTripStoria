@@ -13,6 +13,7 @@ namespace WebApi.Controllers
     public class UsersController : ControllerBase
     {
         private const long MaxProfilePhotoSizeInBytes = 3 * 1024 * 1024;
+        private const long MaxProfilePhotoRequestSizeInBytes = 4 * 1024 * 1024;
         private static readonly HashSet<string> AllowedProfilePhotoExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
             ".jpg",
@@ -194,7 +195,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("me/photo")]
-        [RequestSizeLimit(MaxProfilePhotoSizeInBytes)]
+        [RequestSizeLimit(MaxProfilePhotoRequestSizeInBytes)]
         public async Task<IActionResult> UploadProfilePhoto([FromForm] IFormFile file)
         {
             var identityUserId = GetCurrentIdentityUserId();

@@ -90,12 +90,13 @@ export const useApi = () => {
   const getSummary = () => request<DashboardSummary>('/api/trips/me/summary')
   const getMarkers = () => request<TripMarker[]>('/api/trips/me/map-markers')
   const createTrip = (trip: Record<string, unknown>) => request<Trip>('/api/trips', { method: 'POST', body: trip })
+  const updateTrip = (tripId: number, trip: Record<string, unknown>) => request<Trip>(`/api/trips/${tripId}`, { method: 'PUT', body: trip })
+  const deleteTrip = (tripId: number) => request(`/api/trips/${tripId}`, { method: 'DELETE' })
 
-  const uploadPhoto = (tripId: number, file: File, caption?: string, isCover = false) => {
+  const uploadPhoto = (tripId: number, file: File, caption?: string) => {
     const formData = new FormData()
     formData.append('file', file)
     if (caption) formData.append('caption', caption)
-    formData.append('isCover', String(isCover))
     return request(`/api/trips/${tripId}/photos`, { method: 'POST', body: formData })
   }
   const deletePhoto = (tripId: number, photoId: number) => request(`/api/trips/${tripId}/photos/${photoId}`, { method: 'DELETE' })
@@ -122,6 +123,8 @@ export const useApi = () => {
     getSummary,
     getMarkers,
     createTrip,
+    updateTrip,
+    deleteTrip,
     uploadPhoto,
     deletePhoto
   }

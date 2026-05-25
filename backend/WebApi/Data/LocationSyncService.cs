@@ -162,27 +162,36 @@ namespace WebApi.Data
             try
             {
                 var restCountries = await _httpClient.GetFromJsonAsync<List<RestCountry>>(
-                    "https://restcountries.com/v3.1/independent?status=true&fields=name,latlng");
+                    "https://restcountries.com/v3.1/independent?status=true&fields=name,latlng,capital");
 
                 if (restCountries == null || restCountries.Count == 0)
                     return [];
 
+                var countriesNowCatalog = await GetCountriesNowCatalogAsync();
                 var countries = new List<LocationCountry>();
-                foreach (var name in PreferredCities.Keys)
+                foreach (var restCountry in restCountries.OrderBy(country => country.Name.Common))
                 {
-                    var restCountry = FindRestCountry(restCountries, name);
-                    if (restCountry == null)
-                        continue;
+                    var name = restCountry.Name.Common;
+                    var countryLatitude = ToDecimal(restCountry.Latlng.ElementAtOrDefault(0));
+                    var countryLongitude = ToDecimal(restCountry.Latlng.ElementAtOrDefault(1));
 
-                    var cities = await GetPreferredCitiesFromApiAsync(name);
-                    if (cities.Count == 0 && PreferredCities.TryGetValue(name, out var fallbackCities))
-                        cities = fallbackCities.ToList();
+                    var cities = FindCitiesFromCountriesNow(countriesNowCatalog, name);
+                    if (cities.Count == 0 && PreferredCities.TryGetValue(name, out var preferredCities))
+                        cities = preferredCities.ToList();
+                    if (cities.Count == 0)
+                        cities = restCountry.Capital.Where(capital => !string.IsNullOrWhiteSpace(capital)).ToList();
+                    if (cities.Count == 0)
+                        cities = ["Capital area"];
 
                     countries.Add(new LocationCountry(
                         name,
-                        ToDecimal(restCountry.Latlng.ElementAtOrDefault(0)),
-                        ToDecimal(restCountry.Latlng.ElementAtOrDefault(1)),
-                        cities.Select(CreateLocationCity).ToList()));
+                        countryLatitude,
+                        countryLongitude,
+                        cities
+                            .Distinct(StringComparer.OrdinalIgnoreCase)
+                            .OrderBy(city => city)
+                            .Select(city => CreateLocationCity(city, countryLatitude, countryLongitude))
+                            .ToList()));
                 }
 
                 return countries;
@@ -192,6 +201,25 @@ namespace WebApi.Data
                 _logger.LogWarning(ex, "Could not synchronize locations from external APIs.");
                 return [];
             }
+        }
+
+        private async Task<List<CountriesNowCountryCities>> GetCountriesNowCatalogAsync()
+        {
+            var response = await _httpClient.GetFromJsonAsync<CountriesNowCountriesResponse>(
+                "https://countriesnow.space/api/v0.1/countries");
+
+            return response?.Error == false ? response.Data : [];
+        }
+
+        private static List<string> FindCitiesFromCountriesNow(List<CountriesNowCountryCities> catalog, string countryName)
+        {
+            var aliases = CountryAliases.TryGetValue(countryName, out var values) ? values : [countryName];
+            var match = catalog.FirstOrDefault(country =>
+                aliases.Any(alias => string.Equals(country.Country, alias, StringComparison.OrdinalIgnoreCase)));
+
+            return match?.Cities
+                .Where(city => !string.IsNullOrWhiteSpace(city))
+                .ToList() ?? [];
         }
 
         private async Task<List<string>> GetPreferredCitiesFromApiAsync(string countryName)
@@ -293,6 +321,14 @@ namespace WebApi.Data
             return new LocationCity(name, coordinates.Latitude, coordinates.Longitude);
         }
 
+        private static LocationCity CreateLocationCity(string name, decimal? fallbackLatitude, decimal? fallbackLongitude)
+        {
+            var coordinates = CityCoordinates.GetValueOrDefault(name);
+            var latitude = coordinates.Latitude == 0 ? fallbackLatitude : coordinates.Latitude;
+            var longitude = coordinates.Longitude == 0 ? fallbackLongitude : coordinates.Longitude;
+            return new LocationCity(name, latitude, longitude);
+        }
+
         private static List<LocationCountry> BuildFallbackCatalog()
         {
             return PreferredCities.Select(country =>
@@ -339,6 +375,9 @@ namespace WebApi.Data
 
             [JsonPropertyName("latlng")]
             public List<double> Latlng { get; set; } = [];
+
+            [JsonPropertyName("capital")]
+            public List<string> Capital { get; set; } = [];
         }
 
         private sealed class RestCountryName
@@ -354,6 +393,24 @@ namespace WebApi.Data
 
             [JsonPropertyName("data")]
             public List<string> Data { get; set; } = [];
+        }
+
+        private sealed class CountriesNowCountriesResponse
+        {
+            [JsonPropertyName("error")]
+            public bool Error { get; set; }
+
+            [JsonPropertyName("data")]
+            public List<CountriesNowCountryCities> Data { get; set; } = [];
+        }
+
+        private sealed class CountriesNowCountryCities
+        {
+            [JsonPropertyName("country")]
+            public string Country { get; set; } = string.Empty;
+
+            [JsonPropertyName("cities")]
+            public List<string> Cities { get; set; } = [];
         }
     }
 }

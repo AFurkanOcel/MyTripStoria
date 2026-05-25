@@ -4,9 +4,12 @@
       <div>
         <p class="eyebrow">Trip details</p>
         <h1 class="section-title">{{ trip?.title || 'Loading' }}</h1>
-        <p class="subtitle">{{ trip?.placeName || trip?.cityName || 'Location details' }} · {{ trip?.countryName || '' }}</p>
+        <p class="subtitle">{{ trip?.placeName || trip?.cityName || 'Location details' }} - {{ trip?.countryName || '' }}</p>
       </div>
-      <NuxtLink class="btn btn-ghost" to="/">Dashboard</NuxtLink>
+      <div class="actions">
+        <NuxtLink v-if="trip" class="btn btn-primary" :to="`/trips/${trip.tripID}/edit`">Edit trip</NuxtLink>
+        <NuxtLink class="btn btn-ghost" to="/">Dashboard</NuxtLink>
+      </div>
     </header>
 
     <section v-if="trip" class="dashboard-grid">
@@ -28,7 +31,7 @@
             <img :src="absoluteUrl(photo.url)" :alt="photo.caption || trip.title" />
             <div class="actions" style="justify-content: space-between;">
               <h3>{{ photo.caption || photo.originalFileName }}</h3>
-              <button class="icon-danger" type="button" title="Remove photo" @click.prevent="removePhoto(photo.id)">
+              <button class="icon-danger" type="button" title="Remove photo" @click.prevent="photoToRemove = photo.id">
                 Remove
               </button>
             </div>
@@ -42,15 +45,15 @@
         <form v-else class="form" @submit.prevent="upload">
           <label class="field">
             <span>Photo</span>
-            <input class="input" type="file" accept="image/png,image/jpeg,image/webp" @change="pickFile" />
+            <label class="file-picker">
+              <input type="file" accept="image/png,image/jpeg,image/webp" @change="pickFile" />
+              <span>Choose photo</span>
+              <small>{{ file?.name || 'No file selected' }}</small>
+            </label>
           </label>
           <label class="field">
             <span>Caption</span>
             <input v-model="caption" class="input" />
-          </label>
-          <label class="check-field">
-            <input v-model="isCover" type="checkbox" />
-            <span>Use as cover photo</span>
           </label>
           <p v-if="error" class="error">{{ error }}</p>
           <button class="btn btn-primary" type="submit" :disabled="uploading">
@@ -59,6 +62,17 @@
         </form>
       </aside>
     </section>
+
+    <div v-if="photoToRemove" class="modal-backdrop" role="dialog" aria-modal="true">
+      <div class="modal">
+        <h2>Remove this photo?</h2>
+        <p>This action cannot be undone.</p>
+        <div class="actions" style="justify-content: flex-end;">
+          <button class="btn btn-ghost" type="button" @click="photoToRemove = null">Cancel</button>
+          <button class="btn btn-primary" type="button" @click="removePhoto">Remove</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -71,8 +85,8 @@ const profile = useState<UserProfile | null>('profile')
 const trip = ref<Trip | null>(null)
 const file = ref<File | null>(null)
 const caption = ref('')
-const isCover = ref(false)
 const uploading = ref(false)
+const photoToRemove = ref<number | null>(null)
 const error = ref('')
 
 const load = async () => {
@@ -106,27 +120,35 @@ const upload = async () => {
   uploading.value = true
   error.value = ''
   try {
-    await api.uploadPhoto(trip.value.tripID, file.value, caption.value, isCover.value)
+    await api.uploadPhoto(trip.value.tripID, file.value, caption.value)
     await load()
     file.value = null
     caption.value = ''
-    isCover.value = false
-  } catch {
-    error.value = 'The photo could not be uploaded. Please check your premium status and file size.'
+  } catch (uploadError: any) {
+    error.value = getErrorMessage(uploadError, 'The photo could not be uploaded. Please check your premium status and file size.')
   } finally {
     uploading.value = false
   }
 }
 
-const removePhoto = async (photoId: number) => {
-  if (!trip.value) return
+const removePhoto = async () => {
+  if (!trip.value || !photoToRemove.value) return
 
   error.value = ''
   try {
-    await api.deletePhoto(trip.value.tripID, photoId)
+    await api.deletePhoto(trip.value.tripID, photoToRemove.value)
+    photoToRemove.value = null
     await load()
-  } catch {
-    error.value = 'The photo could not be removed.'
+  } catch (removeError: any) {
+    error.value = getErrorMessage(removeError, 'The photo could not be removed.')
   }
+}
+
+const getErrorMessage = (apiError: any, fallback: string) => {
+  const data = apiError?.data
+  if (typeof data === 'string') return data
+  if (data?.title) return data.title
+  if (data?.errors) return Object.values(data.errors).flat().join(' ')
+  return fallback
 }
 </script>

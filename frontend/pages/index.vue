@@ -37,10 +37,24 @@
         <div v-if="loading" class="subtitle">Loading...</div>
         <div v-else-if="!trips.length" class="premium-note">You do not have any trips yet. Start by planning your first route.</div>
         <div v-else class="trip-list">
-          <TripCard v-for="trip in trips" :key="trip.tripID" :trip="trip" />
+          <article v-for="trip in trips" :key="trip.tripID" class="trip-record">
+            <TripCard :trip="trip" />
+            <button class="icon-danger" type="button" @click="tripToRemove = trip">Remove</button>
+          </article>
         </div>
       </aside>
     </section>
+
+    <div v-if="tripToRemove" class="modal-backdrop" role="dialog" aria-modal="true">
+      <div class="modal">
+        <h2>Remove this trip?</h2>
+        <p>This will permanently delete the trip and its photos.</p>
+        <div class="actions" style="justify-content: flex-end;">
+          <button class="btn btn-ghost" type="button" @click="tripToRemove = null">Cancel</button>
+          <button class="btn btn-primary" type="button" @click="removeTrip">Remove</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -53,9 +67,11 @@ const loading = ref(true)
 const summary = ref<DashboardSummary | null>(null)
 const trips = ref<Trip[]>([])
 const markers = ref<TripMarker[]>([])
+const tripToRemove = ref<Trip | null>(null)
 
-onMounted(async () => {
+const loadDashboard = async () => {
   try {
+    loading.value = true
     const [profileData, summaryData, tripData, markerData] = await Promise.all([
       api.getMe(),
       api.getSummary(),
@@ -69,5 +85,15 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
-})
+}
+
+onMounted(loadDashboard)
+
+const removeTrip = async () => {
+  if (!tripToRemove.value) return
+
+  await api.deleteTrip(tripToRemove.value.tripID)
+  tripToRemove.value = null
+  await loadDashboard()
+}
 </script>

@@ -89,11 +89,12 @@ namespace Repositories.Implementations
             if (existingTrip == null)
                 throw new KeyNotFoundException($"Trip with id {trip.TripID} not found.");
 
+            var existingPhotos = existingTrip.Photos.ToList();
+
             _context.Entry(existingTrip).CurrentValues.SetValues(trip);
             _context.TripWaypoints.RemoveRange(existingTrip.Waypoints);
-            _context.TripPhotos.RemoveRange(existingTrip.Photos);
             existingTrip.Waypoints = trip.Waypoints;
-            existingTrip.Photos = trip.Photos;
+            existingTrip.Photos = trip.Photos.Count > 0 ? trip.Photos : existingPhotos;
 
             await _context.SaveChangesAsync();
             return existingTrip;
