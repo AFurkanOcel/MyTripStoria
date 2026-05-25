@@ -7,7 +7,7 @@
         <p class="subtitle">{{ trip?.placeName || trip?.cityName || 'Location details' }} - {{ trip?.countryName || '' }}</p>
       </div>
       <div class="actions">
-        <NuxtLink v-if="trip" class="btn btn-primary" :to="`/trips/${trip.tripID}/edit`">Edit trip</NuxtLink>
+        <button v-if="trip" class="btn btn-primary" type="button" @click="openEdit">Edit trip</button>
         <NuxtLink class="btn btn-ghost" to="/">Dashboard</NuxtLink>
       </div>
     </header>
@@ -109,6 +109,11 @@ const money = (value?: number) => new Intl.NumberFormat('en-US', { style: 'curre
 const absoluteUrl = (url: string) => `${api.apiBase}${url}`
 const pickFile = (event: Event) => {
   file.value = (event.target as HTMLInputElement).files?.[0] || null
+}
+
+const openEdit = async () => {
+  if (!trip.value) return
+  await navigateTo(`/trips/${trip.value.tripID}/edit`)
 }
 
 const upload = async () => {

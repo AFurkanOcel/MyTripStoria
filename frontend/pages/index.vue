@@ -39,7 +39,7 @@
         <div v-else class="trip-list">
           <article v-for="trip in trips" :key="trip.tripID" class="trip-record">
             <TripCard :trip="trip" />
-            <button class="icon-danger" type="button" @click="tripToRemove = trip">Remove</button>
+            <button class="trip-remove-button" type="button" @click="tripToRemove = trip">Remove</button>
           </article>
         </div>
       </aside>

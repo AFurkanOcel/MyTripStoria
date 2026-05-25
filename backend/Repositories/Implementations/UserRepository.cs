@@ -29,6 +29,19 @@ namespace Repositories.Implementations
                                  .Include(u => u.Trips)
                                  .FirstOrDefaultAsync(u => u.IdentityUserId == identityUserId);
         }
+
+        public override async Task<User> UpdateAsync(User user)
+        {
+            var existingUser = await _context.Users
+                                             .FirstOrDefaultAsync(u => u.UserID == user.UserID);
+
+            if (existingUser == null)
+                throw new KeyNotFoundException($"User with id {user.UserID} not found.");
+
+            _context.Entry(existingUser).CurrentValues.SetValues(user);
+            await _context.SaveChangesAsync();
+            return existingUser;
+        }
     }
 }
 
