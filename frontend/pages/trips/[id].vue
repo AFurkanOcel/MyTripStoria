@@ -113,7 +113,7 @@ const pickFile = (event: Event) => {
 
 const openEdit = async () => {
   if (!trip.value) return
-  await navigateTo(`/trips/${trip.value.tripID}/edit`)
+  await navigateTo(`/trips/edit/${trip.value.tripID}`)
 }
 
 const upload = async () => {

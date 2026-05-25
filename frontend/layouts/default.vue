@@ -21,6 +21,7 @@
 
         <nav class="nav">
           <NuxtLink to="/">Dashboard</NuxtLink>
+          <NuxtLink to="/trips">Trip records</NuxtLink>
           <NuxtLink to="/trips/new">New trip</NuxtLink>
           <NuxtLink to="/profile">Profile</NuxtLink>
           <NuxtLink to="/settings">Settings</NuxtLink>

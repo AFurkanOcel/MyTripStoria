@@ -32,7 +32,7 @@
       <aside class="panel">
         <div class="actions" style="justify-content: space-between; margin-bottom: 14px;">
           <h2 style="margin:0;">Trip records</h2>
-          <span style="color: var(--muted); font-weight: 700;">{{ trips.length }} records</span>
+          <NuxtLink class="text-link" to="/trips">{{ trips.length }} records</NuxtLink>
         </div>
         <div v-if="loading" class="subtitle">Loading...</div>
         <div v-else-if="!trips.length" class="premium-note">You do not have any trips yet. Start by planning your first route.</div>
