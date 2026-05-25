@@ -21,7 +21,8 @@ namespace WebApi.Data
             ["Japan"] = ["Japan"],
             ["Thailand"] = ["Thailand"],
             ["Netherlands"] = ["Netherlands"],
-            ["Czechia"] = ["Czechia", "Czech Republic"]
+            ["Czechia"] = ["Czechia", "Czech Republic"],
+            ["Hungary"] = ["Hungary"]
         };
 
         private static readonly Dictionary<string, string[]> PreferredCities = new(StringComparer.OrdinalIgnoreCase)
@@ -37,7 +38,8 @@ namespace WebApi.Data
             ["Japan"] = ["Tokyo", "Kyoto", "Osaka"],
             ["Thailand"] = ["Bangkok", "Phuket", "Chiang Mai"],
             ["Netherlands"] = ["Amsterdam", "Rotterdam"],
-            ["Czechia"] = ["Prague", "Brno"]
+            ["Czechia"] = ["Prague", "Brno"],
+            ["Hungary"] = ["Budapest"]
         };
 
         private static readonly Dictionary<string, (decimal Latitude, decimal Longitude)> CityCoordinates = new(StringComparer.OrdinalIgnoreCase)
@@ -79,7 +81,8 @@ namespace WebApi.Data
             ["Amsterdam"] = (52.367573m, 4.904139m),
             ["Rotterdam"] = (51.924420m, 4.477733m),
             ["Prague"] = (50.075539m, 14.437800m),
-            ["Brno"] = (49.195061m, 16.606837m)
+            ["Brno"] = (49.195061m, 16.606837m),
+            ["Budapest"] = (47.497913m, 19.040236m)
         };
 
         private static readonly Dictionary<string, string> LegacyCountryNames = new(StringComparer.OrdinalIgnoreCase)
@@ -308,6 +311,7 @@ namespace WebApi.Data
                     "Thailand" => (15.870032m, 100.992541m),
                     "Netherlands" => (52.132633m, 5.291266m),
                     "Czechia" => (49.817492m, 15.472962m),
+                    "Hungary" => (47.162494m, 19.503304m),
                     _ => (0m, 0m)
                 };
 

@@ -2,9 +2,9 @@
   <div>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Tatil detayı</p>
-        <h1 class="section-title">{{ trip?.title || 'Yükleniyor' }}</h1>
-        <p class="subtitle">{{ trip?.placeName || trip?.cityName || 'Konum bilgisi' }} · {{ trip?.countryName || '' }}</p>
+        <p class="eyebrow">Trip details</p>
+        <h1 class="section-title">{{ trip?.title || 'Loading' }}</h1>
+        <p class="subtitle">{{ trip?.placeName || trip?.cityName || 'Location details' }} · {{ trip?.countryName || '' }}</p>
       </div>
       <NuxtLink class="btn btn-ghost" to="/">Dashboard</NuxtLink>
     </header>
@@ -16,38 +16,45 @@
           <span style="color: var(--muted); font-weight: 700;">{{ dateRange }}</span>
         </div>
         <p style="line-height: 1.7;">{{ trip.description }}</p>
+
         <div class="metrics" style="grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 18px;">
-          <div class="metric"><span>Planlanan bütçe</span><strong>{{ money(trip.plannedBudget) }}</strong></div>
-          <div class="metric"><span>Gerçek maliyet</span><strong>{{ money(trip.actualCost) }}</strong></div>
-          <div class="metric"><span>Fotoğraf</span><strong>{{ trip.photos?.length || 0 }}</strong></div>
+          <div class="metric"><span>Budget</span><strong>{{ money(trip.plannedBudget) }}</strong></div>
+          <div class="metric"><span>Photos</span><strong>{{ trip.photos?.length || 0 }}</strong></div>
+          <div class="metric"><span>Visibility</span><strong>{{ trip.visibility }}</strong></div>
         </div>
+
         <div v-if="trip.photos?.length" class="trip-list">
-          <article v-for="photo in trip.photos" :key="photo.id" class="trip-card">
-            <img :src="absoluteUrl(photo.url)" :alt="photo.caption || trip.title" style="width:100%; max-height:320px; object-fit:cover; border-radius:8px; margin-bottom:10px;" />
-            <h3>{{ photo.caption || photo.originalFileName }}</h3>
+          <article v-for="photo in trip.photos" :key="photo.id" class="trip-card photo-card">
+            <img :src="absoluteUrl(photo.url)" :alt="photo.caption || trip.title" />
+            <div class="actions" style="justify-content: space-between;">
+              <h3>{{ photo.caption || photo.originalFileName }}</h3>
+              <button class="icon-danger" type="button" title="Remove photo" @click.prevent="removePhoto(photo.id)">
+                Remove
+              </button>
+            </div>
           </article>
         </div>
       </div>
 
       <aside class="panel">
-        <h2 style="margin-top:0;">Premium fotoğraflar</h2>
-        <p v-if="!profile?.isPremium" class="premium-note">Fotoğraf yükleme premium plana özeldir.</p>
+        <h2 style="margin-top:0;">Premium photos</h2>
+        <p v-if="!profile?.isPremium" class="premium-note">Photo uploads are available on the premium plan.</p>
         <form v-else class="form" @submit.prevent="upload">
           <label class="field">
-            <span>Fotoğraf</span>
+            <span>Photo</span>
             <input class="input" type="file" accept="image/png,image/jpeg,image/webp" @change="pickFile" />
           </label>
           <label class="field">
-            <span>Açıklama</span>
+            <span>Caption</span>
             <input v-model="caption" class="input" />
           </label>
-          <label class="field" style="display:flex; grid-template-columns: auto 1fr; align-items:center; gap:10px;">
+          <label class="check-field">
             <input v-model="isCover" type="checkbox" />
-            <span>Kapak fotoğrafı yap</span>
+            <span>Use as cover photo</span>
           </label>
           <p v-if="error" class="error">{{ error }}</p>
           <button class="btn btn-primary" type="submit" :disabled="uploading">
-            {{ uploading ? 'Yükleniyor' : 'Fotoğraf yükle' }}
+            {{ uploading ? 'Uploading photo' : 'Upload photo' }}
           </button>
         </form>
       </aside>
@@ -81,10 +88,10 @@ onMounted(load)
 
 const dateRange = computed(() => {
   if (!trip.value) return ''
-  return `${new Date(trip.value.startDate).toLocaleDateString('tr-TR')} - ${new Date(trip.value.endDate).toLocaleDateString('tr-TR')}`
+  return `${new Date(trip.value.startDate).toLocaleDateString('en-US')} - ${new Date(trip.value.endDate).toLocaleDateString('en-US')}`
 })
 
-const money = (value?: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value || 0)
+const money = (value?: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value || 0)
 const absoluteUrl = (url: string) => `${api.apiBase}${url}`
 const pickFile = (event: Event) => {
   file.value = (event.target as HTMLInputElement).files?.[0] || null
@@ -92,7 +99,7 @@ const pickFile = (event: Event) => {
 
 const upload = async () => {
   if (!trip.value || !file.value) {
-    error.value = 'Bir fotoğraf seçmelisin.'
+    error.value = 'Choose a photo first.'
     return
   }
 
@@ -105,9 +112,21 @@ const upload = async () => {
     caption.value = ''
     isCover.value = false
   } catch {
-    error.value = 'Fotoğraf yüklenemedi. Premium durumunu ve dosya boyutunu kontrol et.'
+    error.value = 'The photo could not be uploaded. Please check your premium status and file size.'
   } finally {
     uploading.value = false
+  }
+}
+
+const removePhoto = async (photoId: number) => {
+  if (!trip.value) return
+
+  error.value = ''
+  try {
+    await api.deletePhoto(trip.value.tripID, photoId)
+    await load()
+  } catch {
+    error.value = 'The photo could not be removed.'
   }
 }
 </script>

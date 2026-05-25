@@ -12,15 +12,30 @@ namespace WebApi.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
+        private const long MaxProfilePhotoSizeInBytes = 3 * 1024 * 1024;
+        private static readonly HashSet<string> AllowedProfilePhotoExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".webp"
+        };
+
         private readonly IUserService _userService;
         private readonly ICountryService _countryService;
         private readonly ICityService _cityService;
+        private readonly IWebHostEnvironment _environment;
 
-        public UsersController(IUserService userService, ICountryService countryService, ICityService cityService)
+        public UsersController(
+            IUserService userService,
+            ICountryService countryService,
+            ICityService cityService,
+            IWebHostEnvironment environment)
         {
             _userService = userService;
             _countryService = countryService;
             _cityService = cityService;
+            _environment = environment;
         }
 
         [HttpGet]
@@ -117,8 +132,11 @@ namespace WebApi.Controllers
             {
                 IdentityUserId = identityUserId,
                 Username = userPostDto.Username,
+                DisplayName = userPostDto.DisplayName,
                 Email = userPostDto.Email,
                 PhoneNumber = userPostDto.PhoneNumber,
+                ProfilePhotoUrl = userPostDto.ProfilePhotoUrl,
+                Bio = userPostDto.Bio,
                 Age = userPostDto.Age,
                 CountryId = userPostDto.CountryId,
                 CityId = userPostDto.CityId,
@@ -158,14 +176,80 @@ namespace WebApi.Controllers
                 UserID = id,
                 IdentityUserId = userForControl.IdentityUserId,
                 Username = userPutDto.Username,
+                DisplayName = userPutDto.DisplayName,
                 Email = userPutDto.Email,
                 PhoneNumber = userPutDto.PhoneNumber,
+                ProfilePhotoUrl = userForControl.ProfilePhotoUrl,
+                Bio = userPutDto.Bio,
                 Age = userPutDto.Age,
                 CountryId = userPutDto.CountryId,
                 CityId = userPutDto.CityId,
                 Address = userPutDto.Address,
                 Budget = userPutDto.Budget,
                 IsPremium = userPutDto.IsPremium
+            };
+
+            var updatedUser = await _userService.UpdateUserAsync(user);
+            return Ok(await _userService.GetUserByIdAsync(updatedUser.UserID));
+        }
+
+        [HttpPost("me/photo")]
+        [RequestSizeLimit(MaxProfilePhotoSizeInBytes)]
+        public async Task<IActionResult> UploadProfilePhoto([FromForm] IFormFile file)
+        {
+            var identityUserId = GetCurrentIdentityUserId();
+            if (identityUserId == null)
+                return Unauthorized();
+
+            var profile = await _userService.GetUserByIdentityUserIdAsync(identityUserId);
+            if (profile == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            if (file == null || file.Length == 0)
+                return BadRequest("A profile photo file is required.");
+
+            if (file.Length > MaxProfilePhotoSizeInBytes)
+                return BadRequest("Profile photo size must be 3 MB or less.");
+
+            var extension = Path.GetExtension(file.FileName);
+            if (!AllowedProfilePhotoExtensions.Contains(extension))
+                return BadRequest("Only JPG, PNG, and WEBP profile photos are supported.");
+
+            var uploadRoot = GetUploadRootPath();
+            var relativeFolder = Path.Combine("uploads", "profiles", profile.Id.ToString());
+            var absoluteFolder = Path.Combine(uploadRoot, relativeFolder);
+            Directory.CreateDirectory(absoluteFolder);
+
+            var storedFileName = $"{Guid.NewGuid():N}{extension.ToLowerInvariant()}";
+            var absolutePath = Path.Combine(absoluteFolder, storedFileName);
+
+            await using (var stream = System.IO.File.Create(absolutePath))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var existingUser = await _userService.GetUserByIdAsync(profile.Id);
+            if (existingUser == null)
+                return NotFound("A profile has not been created for the current identity user.");
+
+            DeleteUploadedFileIfExists(existingUser.ProfilePhotoUrl);
+
+            var user = new User
+            {
+                UserID = profile.Id,
+                IdentityUserId = existingUser.IdentityUserId,
+                Username = existingUser.Username,
+                DisplayName = existingUser.DisplayName,
+                Email = existingUser.Email,
+                PhoneNumber = existingUser.PhoneNumber,
+                ProfilePhotoUrl = "/" + Path.Combine(relativeFolder, storedFileName).Replace("\\", "/"),
+                Bio = existingUser.Bio,
+                Age = existingUser.Age,
+                CountryId = existingUser.CountryId,
+                CityId = existingUser.CityId,
+                Address = existingUser.Address,
+                Budget = existingUser.Budget,
+                IsPremium = existingUser.IsPremium
             };
 
             var updatedUser = await _userService.UpdateUserAsync(user);
@@ -211,6 +295,26 @@ namespace WebApi.Controllers
         private string? GetCurrentIdentityUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
+
+        private string GetUploadRootPath()
+        {
+            if (!string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                return _environment.WebRootPath;
+
+            return Path.Combine(_environment.ContentRootPath, "wwwroot");
+        }
+
+        private void DeleteUploadedFileIfExists(string? url)
+        {
+            if (string.IsNullOrWhiteSpace(url) || !url.StartsWith("/uploads/", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            var relativePath = url.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString());
+            var absolutePath = Path.Combine(GetUploadRootPath(), relativePath);
+
+            if (System.IO.File.Exists(absolutePath))
+                System.IO.File.Delete(absolutePath);
         }
     }
 }

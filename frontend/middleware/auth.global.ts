@@ -1,7 +1,7 @@
 export default defineNuxtRouteMiddleware((to) => {
   if (process.server) return
 
-  const publicRoutes = ['/login', '/register']
+  const publicRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
   const api = useApi()
   const token = api.loadToken()
 

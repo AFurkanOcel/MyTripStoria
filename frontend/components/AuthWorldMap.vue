@@ -10,13 +10,20 @@
 </template>
 
 <script setup lang="ts">
+const route = useRoute()
 const mapElement = ref<HTMLElement | null>(null)
+let map: any
 
-onMounted(async () => {
-  if (!mapElement.value) return
+const resizeMap = () => {
+  if (!map) return
+  map.invalidateSize()
+}
+
+const mountMap = async () => {
+  if (!mapElement.value || map) return
 
   const L = await import('leaflet')
-  const map = L.map(mapElement.value, {
+  map = L.map(mapElement.value, {
     attributionControl: false,
     boxZoom: false,
     doubleClickZoom: false,
@@ -33,6 +40,16 @@ onMounted(async () => {
     minZoom: 2
   }).addTo(map)
 
-  setTimeout(() => map.invalidateSize(), 0)
+  await nextTick()
+  resizeMap()
+  setTimeout(resizeMap, 80)
+  setTimeout(resizeMap, 300)
+}
+
+onMounted(mountMap)
+
+watch(() => route.path, async () => {
+  await nextTick()
+  setTimeout(resizeMap, 0)
 })
 </script>

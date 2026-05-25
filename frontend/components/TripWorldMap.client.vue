@@ -14,6 +14,7 @@ const paintMarkers = async () => {
   if (!map) return
   const L = await import('leaflet')
   layerGroup.clearLayers()
+  const bounds: any[] = []
 
   props.markers.forEach((marker) => {
     const icon = L.divIcon({
@@ -23,10 +24,21 @@ const paintMarkers = async () => {
       iconAnchor: [9, 9]
     })
 
-    L.marker([Number(marker.latitude), Number(marker.longitude)], { icon })
+    const point = [Number(marker.latitude), Number(marker.longitude)] as [number, number]
+    bounds.push(point)
+
+    L.marker(point, { icon })
       .bindPopup(`<strong>${marker.title}</strong><br>${marker.cityName || ''} ${marker.countryName || ''}<br>${marker.status}`)
       .addTo(layerGroup)
   })
+
+  if (bounds.length === 1) {
+    map.setView(bounds[0], 5)
+  } else if (bounds.length > 1) {
+    map.fitBounds(bounds, { padding: [36, 36], maxZoom: 6 })
+  }
+
+  setTimeout(() => map.invalidateSize(), 0)
 }
 
 onMounted(async () => {
@@ -38,6 +50,7 @@ onMounted(async () => {
     maxZoom: 18
   }).addTo(map)
   layerGroup = L.layerGroup().addTo(map)
+  setTimeout(() => map.invalidateSize(), 0)
   await paintMarkers()
 })
 

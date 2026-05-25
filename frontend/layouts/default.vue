@@ -2,24 +2,48 @@
   <div v-if="isAuthPage">
     <slot />
   </div>
+
   <div v-else class="app-shell">
     <aside class="sidebar">
-      <NuxtLink class="brand" to="/">
-        <img src="/icon.png" alt="MyTripStoria" />
-        <span>MyTripStoria</span>
-      </NuxtLink>
-      <nav class="nav">
-        <NuxtLink to="/">Dashboard</NuxtLink>
-        <NuxtLink to="/trips/new">Yeni tatil</NuxtLink>
-        <button type="button" @click="signOut">Çıkış yap</button>
-      </nav>
-      <div class="premium-note" v-if="profile">
-        {{ profile.isPremium ? 'Premium hesap: fotoğraf yükleme açık.' : 'Normal hesap: fotoğraf yükleme premium ile açılır.' }}
+      <div class="sidebar-top">
+        <NuxtLink class="brand" to="/">
+          <img src="/icon.png" alt="MyTripStoria" />
+          <span>MyTripStoria</span>
+        </NuxtLink>
+
+        <NuxtLink v-if="profile" class="sidebar-profile" to="/profile">
+          <img :src="profilePhoto" :alt="displayName" />
+          <span>
+            <strong>{{ displayName }}</strong>
+            <small>{{ profile.isPremium ? 'Premium' : 'Standard' }}</small>
+          </span>
+        </NuxtLink>
+
+        <nav class="nav">
+          <NuxtLink to="/">Dashboard</NuxtLink>
+          <NuxtLink to="/trips/new">New trip</NuxtLink>
+          <NuxtLink to="/profile">Profile</NuxtLink>
+          <NuxtLink to="/settings">Settings</NuxtLink>
+        </nav>
       </div>
+
+      <button class="sidebar-signout" type="button" @click="showSignOut = true">Sign out</button>
     </aside>
+
     <main class="main">
       <slot />
     </main>
+
+    <div v-if="showSignOut" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="sign-out-title">
+      <section class="modal">
+        <h2 id="sign-out-title">Sign out?</h2>
+        <p>Are you sure you want to sign out of MyTripStoria?</p>
+        <div class="actions" style="justify-content: flex-end;">
+          <button class="btn btn-ghost" type="button" @click="showSignOut = false">Cancel</button>
+          <button class="btn btn-primary" type="button" @click="confirmSignOut">Sign out</button>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -29,7 +53,15 @@ import type { UserProfile } from '~/types'
 const route = useRoute()
 const api = useApi()
 const profile = useState<UserProfile | null>('profile', () => null)
-const isAuthPage = computed(() => ['/login', '/register'].includes(route.path))
+const showSignOut = ref(false)
+const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
+const isAuthPage = computed(() => authRoutes.includes(route.path))
+
+const displayName = computed(() => profile.value?.displayName || profile.value?.username || 'Traveler')
+const profilePhoto = computed(() => {
+  if (!profile.value?.profilePhotoUrl) return '/icon.png'
+  return `${api.apiBase}${profile.value.profilePhotoUrl}`
+})
 
 onMounted(async () => {
   if (!isAuthPage.value && !profile.value) {
@@ -42,9 +74,10 @@ onMounted(async () => {
   }
 })
 
-const signOut = async () => {
+const confirmSignOut = async () => {
   api.logout()
   profile.value = null
+  showSignOut.value = false
   await navigateTo('/login')
 }
 </script>

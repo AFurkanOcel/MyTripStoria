@@ -4,8 +4,11 @@ namespace Contracts.UserDtos
     {
         public string? IdentityUserId { get; set; }
         public string Username { get; set; } = string.Empty;
+        public string? DisplayName { get; set; }
         public string Email { get; set; } = string.Empty;
         public string PhoneNumber { get; set; } = string.Empty;
+        public string? ProfilePhotoUrl { get; set; }
+        public string? Bio { get; set; }
         public int Age { get; set; }
         public int CountryId { get; set; }
         public int CityId { get; set; }

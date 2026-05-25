@@ -6,10 +6,10 @@
 const props = defineProps<{ status?: string }>()
 
 const label = computed(() => {
-  if (props.status === 'Completed') return 'Geçmiş'
-  if (props.status === 'Ongoing') return 'Devam ediyor'
-  if (props.status === 'Cancelled') return 'İptal'
-  return 'Planlandı'
+  if (props.status === 'Completed') return 'Completed'
+  if (props.status === 'Ongoing') return 'Ongoing'
+  if (props.status === 'Cancelled') return 'Cancelled'
+  return 'Planned'
 })
 
 const className = computed(() => {

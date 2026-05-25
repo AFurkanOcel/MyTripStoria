@@ -77,6 +77,12 @@ export const useApi = () => {
   const logout = () => setToken(null)
   const getMe = () => request<UserProfile>('/api/users/me')
   const createProfile = (profile: Partial<UserProfile>) => request<UserProfile>('/api/users', { method: 'POST', body: profile })
+  const updateProfile = (profile: UserProfile) => request<UserProfile>(`/api/users/${profile.id}`, { method: 'PUT', body: profile })
+  const uploadProfilePhoto = (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return request<UserProfile>('/api/users/me/photo', { method: 'POST', body: formData })
+  }
   const getCountries = () => request<Country[]>('/api/countries')
   const getCities = () => request<City[]>('/api/cities')
   const getTrips = () => request<Trip[]>('/api/trips/me')
@@ -92,6 +98,7 @@ export const useApi = () => {
     formData.append('isCover', String(isCover))
     return request(`/api/trips/${tripId}/photos`, { method: 'POST', body: formData })
   }
+  const deletePhoto = (tripId: number, photoId: number) => request(`/api/trips/${tripId}/photos/${photoId}`, { method: 'DELETE' })
 
   return {
     apiBase,
@@ -106,6 +113,8 @@ export const useApi = () => {
     logout,
     getMe,
     createProfile,
+    updateProfile,
+    uploadProfilePhoto,
     getCountries,
     getCities,
     getTrips,
@@ -113,6 +122,7 @@ export const useApi = () => {
     getSummary,
     getMarkers,
     createTrip,
-    uploadPhoto
+    uploadPhoto,
+    deletePhoto
   }
 }

@@ -3,27 +3,27 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Dashboard</p>
-        <h1 class="section-title">Hoş geldin{{ profile?.username ? `, ${profile.username}` : '' }}.</h1>
-        <p class="subtitle">Geçmiş tatillerin ve planladığın rotalar tek haritada.</p>
+        <h1 class="section-title">Welcome{{ profile?.username ? `, ${profile.username}` : '' }}.</h1>
+        <p class="subtitle">Your completed trips and planned routes, gathered on one world map.</p>
       </div>
-      <NuxtLink class="btn btn-accent" to="/trips/new">Yeni tatil planla</NuxtLink>
+      <NuxtLink class="btn btn-accent" to="/trips/new">Plan a new trip</NuxtLink>
     </header>
 
     <section class="metrics">
-      <div class="metric"><span>Toplam tatil</span><strong>{{ summary?.totalTrips ?? 0 }}</strong></div>
-      <div class="metric"><span>Planlanan</span><strong>{{ summary?.plannedTrips ?? 0 }}</strong></div>
-      <div class="metric"><span>Geçmiş</span><strong>{{ summary?.completedTrips ?? 0 }}</strong></div>
-      <div class="metric"><span>Seyahat günü</span><strong>{{ summary?.totalTravelDays ?? 0 }}</strong></div>
+      <div class="metric"><span>Total trips</span><strong>{{ summary?.totalTrips ?? 0 }}</strong></div>
+      <div class="metric"><span>Planned</span><strong>{{ summary?.plannedTrips ?? 0 }}</strong></div>
+      <div class="metric"><span>Completed</span><strong>{{ summary?.completedTrips ?? 0 }}</strong></div>
+      <div class="metric"><span>Travel days</span><strong>{{ summary?.totalTravelDays ?? 0 }}</strong></div>
     </section>
 
     <section class="dashboard-grid">
       <div class="panel">
         <div class="actions" style="justify-content: space-between; margin-bottom: 14px;">
-          <h2 style="margin:0;">Dünya haritası</h2>
+          <h2 style="margin:0;">World map</h2>
           <div class="actions">
-            <span class="badge badge-planned">Planlanan</span>
-            <span class="badge badge-completed">Geçmiş</span>
-            <span class="badge badge-ongoing">Devam eden</span>
+            <span class="badge badge-planned">Planned</span>
+            <span class="badge badge-completed">Completed</span>
+            <span class="badge badge-ongoing">Ongoing</span>
           </div>
         </div>
         <TripWorldMap :markers="markers" />
@@ -31,11 +31,11 @@
 
       <aside class="panel">
         <div class="actions" style="justify-content: space-between; margin-bottom: 14px;">
-          <h2 style="margin:0;">Tatil kayıtları</h2>
-          <span style="color: var(--muted); font-weight: 700;">{{ trips.length }} kayıt</span>
+          <h2 style="margin:0;">Trip records</h2>
+          <span style="color: var(--muted); font-weight: 700;">{{ trips.length }} records</span>
         </div>
-        <div v-if="loading" class="subtitle">Yükleniyor...</div>
-        <div v-else-if="!trips.length" class="premium-note">Henüz tatil kaydın yok. İlk rotanı planlayarak başlayabilirsin.</div>
+        <div v-if="loading" class="subtitle">Loading...</div>
+        <div v-else-if="!trips.length" class="premium-note">You do not have any trips yet. Start by planning your first route.</div>
         <div v-else class="trip-list">
           <TripCard v-for="trip in trips" :key="trip.tripID" :trip="trip" />
         </div>

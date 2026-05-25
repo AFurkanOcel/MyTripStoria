@@ -5,7 +5,7 @@
       <span style="color: var(--muted); font-size: 13px;">{{ dateRange }}</span>
     </div>
     <h3>{{ trip.title }}</h3>
-    <p>{{ trip.placeName || trip.cityName || 'Konum seçilmedi' }} · {{ trip.countryName || 'Ülke seçilmedi' }}</p>
+    <p>{{ trip.placeName || trip.cityName || 'No location selected' }} · {{ trip.countryName || 'No country selected' }}</p>
   </NuxtLink>
 </template>
 
@@ -14,8 +14,8 @@ import type { Trip } from '~/types'
 
 const props = defineProps<{ trip: Trip }>()
 const dateRange = computed(() => {
-  const start = new Date(props.trip.startDate).toLocaleDateString('tr-TR')
-  const end = new Date(props.trip.endDate).toLocaleDateString('tr-TR')
+  const start = new Date(props.trip.startDate).toLocaleDateString('en-US')
+  const end = new Date(props.trip.endDate).toLocaleDateString('en-US')
   return `${start} - ${end}`
 })
 </script>

@@ -2,9 +2,13 @@ export type TripStatus = 'Planned' | 'Ongoing' | 'Completed' | 'Cancelled'
 
 export interface UserProfile {
   id: number
+  identityUserId?: string
   username: string
+  displayName?: string
   email: string
   phoneNumber: string
+  profilePhotoUrl?: string
+  bio?: string
   age: number
   countryId: number
   cityId: number
@@ -26,6 +30,7 @@ export interface City {
   id: number
   name: string
   countryId: number
+  countryName?: string
   latitude?: number
   longitude?: number
 }

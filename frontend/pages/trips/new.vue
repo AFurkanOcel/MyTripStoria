@@ -2,9 +2,9 @@
   <div>
     <header class="topbar">
       <div>
-        <p class="eyebrow">Yeni tatil</p>
-        <h1 class="section-title">Plan veya geçmiş tatil kaydı oluştur.</h1>
-        <p class="subtitle">Konum bilgisi girersen kayıt haritada renkli marker olarak görünür.</p>
+        <p class="eyebrow">New trip</p>
+        <h1 class="section-title">Create a planned route or completed trip.</h1>
+        <p class="subtitle">Choose a city and MyTripStoria will place it on your world map automatically.</p>
       </div>
       <NuxtLink class="btn btn-ghost" to="/">Dashboard</NuxtLink>
     </header>
@@ -13,32 +13,32 @@
       <form class="form" @submit.prevent="submit">
         <div class="grid-2">
           <label class="field">
-            <span>Başlık</span>
-            <input v-model="form.title" class="input" required />
+            <span>Title</span>
+            <input v-model.trim="form.title" class="input" required />
           </label>
           <label class="field">
-            <span>Tip</span>
-            <input v-model="form.tripType" class="input" placeholder="Balayı, aile tatili, iş seyahati" required />
+            <span>Type</span>
+            <input v-model.trim="form.tripType" class="input" placeholder="Honeymoon, family trip, business travel" required />
           </label>
         </div>
 
         <label class="field">
-          <span>Açıklama</span>
-          <textarea v-model="form.description" class="textarea" required />
+          <span>Description</span>
+          <textarea v-model.trim="form.description" class="textarea" required />
         </label>
 
         <div class="grid-2">
           <label class="field">
-            <span>Durum</span>
+            <span>Status</span>
             <select v-model="form.status" class="select">
-              <option value="Planned">Planlandı</option>
-              <option value="Ongoing">Devam ediyor</option>
-              <option value="Completed">Geçmiş</option>
-              <option value="Cancelled">İptal</option>
+              <option value="Planned">Planned</option>
+              <option value="Ongoing">Ongoing</option>
+              <option value="Completed">Completed</option>
+              <option value="Cancelled">Cancelled</option>
             </select>
           </label>
           <label class="field">
-            <span>Görünürlük</span>
+            <span>Visibility</span>
             <select v-model="form.visibility" class="select">
               <option value="Private">Private</option>
               <option value="Public">Public</option>
@@ -48,67 +48,49 @@
 
         <div class="grid-2">
           <label class="field">
-            <span>Ülke ID</span>
-            <input v-model.number="form.countryId" class="input" type="number" min="1" required />
+            <span>Country</span>
+            <select v-model.number="form.countryId" class="select" required>
+              <option v-for="country in countries" :key="country.id" :value="country.id">{{ country.name }}</option>
+            </select>
           </label>
           <label class="field">
-            <span>Şehir ID</span>
-            <input v-model.number="form.cityId" class="input" type="number" min="1" required />
-          </label>
-        </div>
-
-        <div class="grid-2">
-          <label class="field">
-            <span>Yer adı</span>
-            <input v-model="form.placeName" class="input" placeholder="Kapadokya, Prag Old Town..." />
-          </label>
-          <label class="field">
-            <span>Adres</span>
-            <input v-model="form.address" class="input" />
+            <span>City</span>
+            <select v-model.number="form.cityId" class="select" required>
+              <option v-for="city in filteredCities" :key="city.id" :value="city.id">{{ city.name }}</option>
+            </select>
           </label>
         </div>
 
         <div class="grid-2">
           <label class="field">
-            <span>Enlem</span>
-            <input v-model.number="form.latitude" class="input" type="number" step="0.000001" />
+            <span>Place name</span>
+            <input v-model.trim="form.placeName" class="input" placeholder="Buda Castle, Old Town, beach house..." />
           </label>
           <label class="field">
-            <span>Boylam</span>
-            <input v-model.number="form.longitude" class="input" type="number" step="0.000001" />
+            <span>Budget</span>
+            <input v-model.number="form.budget" class="input" type="number" min="0" />
           </label>
         </div>
 
         <div class="grid-2">
           <label class="field">
-            <span>Başlangıç</span>
+            <span>Start date</span>
             <input v-model="form.startDate" class="input" type="date" required />
           </label>
           <label class="field">
-            <span>Bitiş</span>
+            <span>End date</span>
             <input v-model="form.endDate" class="input" type="date" required />
           </label>
         </div>
 
-        <div class="grid-2">
-          <label class="field">
-            <span>Planlanan bütçe</span>
-            <input v-model.number="form.plannedBudget" class="input" type="number" min="0" />
-          </label>
-          <label class="field">
-            <span>Gerçek maliyet</span>
-            <input v-model.number="form.actualCost" class="input" type="number" min="0" />
-          </label>
-        </div>
-
         <label class="field">
-          <span>Notlar</span>
-          <textarea v-model="form.notes" class="textarea" />
+          <span>Notes</span>
+          <textarea v-model.trim="form.notes" class="textarea" />
         </label>
 
         <p v-if="error" class="error">{{ error }}</p>
         <button class="btn btn-primary" type="submit" :disabled="loading">
-          {{ loading ? 'Kaydediliyor' : 'Tatili kaydet' }}
+          {{ loading ? 'Saving trip' : 'Save trip' }}
         </button>
       </form>
     </section>
@@ -116,11 +98,16 @@
 </template>
 
 <script setup lang="ts">
+import type { City, Country, UserProfile } from '~/types'
+
 const api = useApi()
-const profile = useState<any>('profile')
+const profile = useState<UserProfile | null>('profile')
 const loading = ref(false)
 const error = ref('')
+const countries = ref<Country[]>([])
+const cities = ref<City[]>([])
 const today = new Date().toISOString().slice(0, 10)
+
 const form = reactive({
   title: '',
   tripType: '',
@@ -130,32 +117,70 @@ const form = reactive({
   countryId: 1,
   cityId: 1,
   placeName: '',
-  address: '',
-  latitude: undefined as number | undefined,
-  longitude: undefined as number | undefined,
+  budget: 0,
   startDate: today,
   endDate: today,
-  plannedBudget: 0,
-  actualCost: undefined as number | undefined,
   notes: ''
 })
 
+const filteredCities = computed(() => cities.value.filter((city) => city.countryId === form.countryId))
+const selectedCity = computed(() => cities.value.find((city) => city.id === form.cityId))
+const selectedCountry = computed(() => countries.value.find((country) => country.id === form.countryId))
+
+watch(filteredCities, (items) => {
+  if (items.length && !items.some((city) => city.id === form.cityId)) {
+    form.cityId = items[0].id
+  }
+})
+
 onMounted(async () => {
-  if (!profile.value) profile.value = await api.getMe()
+  const [profileData, countryData, cityData] = await Promise.all([
+    profile.value ? Promise.resolve(profile.value) : api.getMe(),
+    api.getCountries(),
+    api.getCities()
+  ])
+
+  profile.value = profileData
+  countries.value = countryData
+  cities.value = cityData
+
+  if (countries.value.length) form.countryId = countries.value[0].id
+  if (filteredCities.value.length) form.cityId = filteredCities.value[0].id
 })
 
 const submit = async () => {
+  if (!profile.value) return
+
   loading.value = true
   error.value = ''
+
   try {
+    const latitude = selectedCity.value?.latitude ?? selectedCountry.value?.latitude
+    const longitude = selectedCity.value?.longitude ?? selectedCountry.value?.longitude
+
     const trip = await api.createTrip({
       userId: profile.value.id,
       isCompleted: form.status === 'Completed',
-      ...form
+      title: form.title,
+      tripType: form.tripType,
+      description: form.description,
+      status: form.status,
+      visibility: form.visibility,
+      countryId: form.countryId,
+      cityId: form.cityId,
+      placeName: form.placeName,
+      address: '',
+      latitude,
+      longitude,
+      plannedBudget: form.budget,
+      actualCost: undefined,
+      startDate: form.startDate,
+      endDate: form.endDate,
+      notes: form.notes
     })
     await navigateTo(`/trips/${trip.tripID}`)
   } catch {
-    error.value = 'Tatil kaydı oluşturulamadı. Tarih, ülke/şehir veya konum bilgilerini kontrol et.'
+    error.value = 'The trip could not be saved. Please check the dates and location.'
   } finally {
     loading.value = false
   }
