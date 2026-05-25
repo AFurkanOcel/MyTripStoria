@@ -60,6 +60,20 @@ export const useApi = () => {
     })
   }
 
+  const forgotPassword = (email: string) => {
+    return $fetch(`${apiBase}/forgotPassword`, {
+      method: 'POST',
+      body: { email }
+    })
+  }
+
+  const resetPassword = (email: string, resetCode: string, newPassword: string) => {
+    return $fetch(`${apiBase}/resetPassword`, {
+      method: 'POST',
+      body: { email, resetCode, newPassword }
+    })
+  }
+
   const logout = () => setToken(null)
   const getMe = () => request<UserProfile>('/api/users/me')
   const createProfile = (profile: Partial<UserProfile>) => request<UserProfile>('/api/users', { method: 'POST', body: profile })
@@ -87,6 +101,8 @@ export const useApi = () => {
     request,
     login,
     registerIdentity,
+    forgotPassword,
+    resetPassword,
     logout,
     getMe,
     createProfile,

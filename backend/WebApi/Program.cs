@@ -5,6 +5,7 @@ using Services.Interfaces;
 using Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 using WebApi.Data;
+using WebApi.Services;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 
@@ -35,6 +36,7 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IEmailSender<IdentityUser>, DevelopmentIdentityEmailSender>();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>().AddEntityFrameworkStores<AuthDbContext>();
 
 //frontend

@@ -5,72 +5,101 @@
         <img src="/icon.png" alt="MyTripStoria" />
         <span>MyTripStoria</span>
       </NuxtLink>
+
       <div>
-        <p class="eyebrow">Yeni hesap</p>
-        <h1 class="title">MyTripStoria hesabını oluştur.</h1>
-        <p class="subtitle">Kayıttan sonra profilin oluşturulur ve tatil kayıtların hesabına bağlı saklanır.</p>
+        <p class="eyebrow">New account</p>
+        <h1 class="title">Create your MyTripStoria account.</h1>
+        <p class="subtitle">Your profile keeps every planned route and completed trip connected to your own travel story.</p>
       </div>
+
       <form class="form" @submit.prevent="submit">
         <div class="grid-2">
           <label class="field">
-            <span>Kullanıcı adı</span>
-            <input v-model="form.username" class="input" required />
+            <span>Username</span>
+            <input v-model.trim="form.username" class="input" autocomplete="username" required />
           </label>
+
           <label class="field">
-            <span>E-posta</span>
-            <input v-model="form.email" class="input" type="email" required />
-          </label>
-        </div>
-        <div class="grid-2">
-          <label class="field">
-            <span>Şifre</span>
-            <input v-model="form.password" class="input" type="password" required />
-          </label>
-          <label class="field">
-            <span>Telefon</span>
-            <input v-model="form.phoneNumber" class="input" />
+            <span>Email</span>
+            <input v-model.trim="form.email" class="input" type="email" autocomplete="email" required />
           </label>
         </div>
+
         <div class="grid-2">
           <label class="field">
-            <span>Yaş</span>
+            <span>Password</span>
+            <input v-model="form.password" class="input" type="password" autocomplete="new-password" required />
+          </label>
+
+          <label class="field">
+            <span>Confirm password</span>
+            <input v-model="form.confirmPassword" class="input" type="password" autocomplete="new-password" required />
+          </label>
+        </div>
+
+        <div class="grid-2">
+          <label class="field">
+            <span>Age</span>
             <input v-model.number="form.age" class="input" type="number" min="13" required />
           </label>
+
           <label class="field">
-            <span>Bütçe</span>
-            <input v-model.number="form.budget" class="input" type="number" min="0" />
+            <span>Phone number</span>
+            <div class="phone-input">
+              <select v-model="form.phoneCountryCode" class="select phone-code" aria-label="Phone country code">
+                <option v-for="code in phoneCountryCodes" :key="code" :value="code">{{ code }}</option>
+              </select>
+              <input
+                v-model="form.localPhoneNumber"
+                class="input"
+                inputmode="numeric"
+                maxlength="10"
+                pattern="[0-9]{10}"
+                placeholder="5551234567"
+                required
+                @input="sanitizePhone"
+              />
+            </div>
           </label>
         </div>
+
         <div class="grid-2">
           <label class="field">
-            <span>Ülke</span>
+            <span>Country</span>
             <select v-model.number="form.countryId" class="select" required>
               <option v-for="country in countries" :key="country.id" :value="country.id">{{ country.name }}</option>
             </select>
           </label>
+
           <label class="field">
-            <span>Şehir</span>
+            <span>City</span>
             <select v-model.number="form.cityId" class="select" required>
               <option v-for="city in filteredCities" :key="city.id" :value="city.id">{{ city.name }}</option>
             </select>
           </label>
         </div>
+
         <label class="field">
-          <span>Adres</span>
-          <input v-model="form.address" class="input" />
+          <span>Address</span>
+          <input v-model.trim="form.address" class="input" autocomplete="street-address" />
         </label>
-        <label class="field" style="display:flex; grid-template-columns: auto 1fr; align-items:center; gap:10px;">
+
+        <label class="check-field">
           <input v-model="form.isPremium" type="checkbox" />
-          <span>Premium planı dene</span>
+          <span>Start with the premium plan</span>
         </label>
+
         <p v-if="error" class="error">{{ error }}</p>
+
         <button class="btn btn-primary" type="submit" :disabled="loading">
-          {{ loading ? 'Hesap oluşturuluyor' : 'Kayıt ol' }}
+          {{ loading ? 'Creating account' : 'Create account' }}
         </button>
       </form>
-      <p class="subtitle">Zaten hesabın var mı? <NuxtLink style="color: var(--primary); font-weight: 800;" to="/login">Giriş yap</NuxtLink></p>
+
+      <p class="subtitle">Already have an account? <NuxtLink class="text-link strong" to="/login">Sign in</NuxtLink></p>
     </section>
-    <section class="auth-visual" />
+
+    <AuthWorldMap />
   </div>
 </template>
 
@@ -82,16 +111,19 @@ const loading = ref(false)
 const error = ref('')
 const countries = ref<Country[]>([])
 const cities = ref<City[]>([])
+const phoneCountryCodes = ['+90', '+1', '+44', '+49', '+33', '+39', '+34', '+31', '+81', '+66']
+
 const form = reactive({
   username: '',
   email: '',
   password: '',
-  phoneNumber: '',
+  confirmPassword: '',
+  phoneCountryCode: '+90',
+  localPhoneNumber: '',
   age: 18,
   countryId: 1,
   cityId: 1,
   address: '',
-  budget: 0,
   isPremium: false
 })
 
@@ -116,6 +148,10 @@ const getApiErrorMessage = (err: unknown) => {
   return apiError.data?.detail || apiError.data?.title || apiError.statusMessage || ''
 }
 
+const sanitizePhone = () => {
+  form.localPhoneNumber = form.localPhoneNumber.replace(/\D/g, '').slice(0, 10)
+}
+
 watch(filteredCities, (items) => {
   if (items.length && !items.some((city) => city.id === form.cityId)) form.cityId = items[0].id
 })
@@ -128,13 +164,27 @@ onMounted(async () => {
     if (countries.value.length) form.countryId = countries.value[0].id
     if (filteredCities.value.length) form.cityId = filteredCities.value[0].id
   } catch {
-    error.value = 'Ülke ve şehir listesi alınamadı. Backend çalışıyor mu kontrol et.'
+    error.value = 'Country and city options could not be loaded. Please check that the backend is running.'
   }
 })
 
 const submit = async () => {
   loading.value = true
   error.value = ''
+  sanitizePhone()
+
+  if (form.password !== form.confirmPassword) {
+    error.value = 'Passwords do not match.'
+    loading.value = false
+    return
+  }
+
+  if (form.localPhoneNumber.length !== 10) {
+    error.value = 'Phone number must contain exactly 10 digits.'
+    loading.value = false
+    return
+  }
+
   try {
     try {
       await api.registerIdentity(form.email, form.password)
@@ -149,20 +199,20 @@ const submit = async () => {
     await api.createProfile({
       username: form.username,
       email: form.email,
-      phoneNumber: form.phoneNumber,
+      phoneNumber: `${form.phoneCountryCode}${form.localPhoneNumber}`,
       age: form.age,
       countryId: form.countryId,
       cityId: form.cityId,
       address: form.address,
-      budget: form.budget,
+      budget: 0,
       isPremium: form.isPremium
     })
     await navigateTo('/')
   } catch (err) {
     const message = getApiErrorMessage(err)
     error.value = message
-      ? `Kayit tamamlanamadi: ${message}`
-      : 'Kayit tamamlanamadi. E-posta, sifre, kullanici adi veya ulke/sehir bilgisini kontrol et.'
+      ? `Registration could not be completed: ${message}`
+      : 'Registration could not be completed. Please check your email, password, username, and location.'
   } finally {
     loading.value = false
   }

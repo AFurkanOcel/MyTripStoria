@@ -5,28 +5,39 @@
         <img src="/icon.png" alt="MyTripStoria" />
         <span>MyTripStoria</span>
       </NuxtLink>
+
       <div>
-        <p class="eyebrow">Seyahatlerini tek haritada topla</p>
-        <h1 class="title">Tatil planların ve anıların için profesyonel alan.</h1>
-        <p class="subtitle">Giriş yap, geçmiş tatillerini gör, yeni rotalar planla ve premium ile fotoğraf arşivini büyüt.</p>
+        <p class="eyebrow">Your trips on one map</p>
+        <h1 class="title">Plan future escapes and keep every travel memory in one place.</h1>
+        <p class="subtitle">Sign in to revisit past trips, plan new routes, and grow your travel archive with premium photo memories.</p>
       </div>
+
       <form class="form" @submit.prevent="submit">
         <label class="field">
-          <span>E-posta</span>
+          <span>Email</span>
           <input v-model="email" class="input" type="email" autocomplete="email" required />
         </label>
+
         <label class="field">
-          <span>Şifre</span>
+          <span>Password</span>
           <input v-model="password" class="input" type="password" autocomplete="current-password" required />
         </label>
+
+        <div class="form-row">
+          <NuxtLink class="text-link" to="/forgot-password">Forgot password?</NuxtLink>
+        </div>
+
         <p v-if="error" class="error">{{ error }}</p>
+
         <button class="btn btn-primary" type="submit" :disabled="loading">
-          {{ loading ? 'Giriş yapılıyor' : 'Giriş yap' }}
+          {{ loading ? 'Signing in' : 'Sign in' }}
         </button>
       </form>
-      <p class="subtitle">Hesabın yok mu? <NuxtLink style="color: var(--primary); font-weight: 800;" to="/register">Kayıt ol</NuxtLink></p>
+
+      <p class="subtitle">Do not have an account? <NuxtLink class="text-link strong" to="/register">Create one</NuxtLink></p>
     </section>
-    <section class="auth-visual" />
+
+    <AuthWorldMap />
   </div>
 </template>
 
@@ -40,11 +51,12 @@ const error = ref('')
 const submit = async () => {
   loading.value = true
   error.value = ''
+
   try {
     await api.login(email.value, password.value)
     await navigateTo('/')
   } catch {
-    error.value = 'E-posta veya şifre hatalı.'
+    error.value = 'The email or password is incorrect.'
   } finally {
     loading.value = false
   }
