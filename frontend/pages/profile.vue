@@ -6,7 +6,7 @@
         <h1 class="section-title">Your travel identity</h1>
         <p class="subtitle">Review the information connected to your MyTripStoria account.</p>
       </div>
-      <NuxtLink class="btn btn-primary" to="/profile/edit">Edit profile</NuxtLink>
+      <button class="btn btn-primary" type="button" @click="openEditProfile">Edit profile</button>
     </header>
 
     <section v-if="loading" class="panel">
@@ -77,4 +77,8 @@ onMounted(async () => {
   Object.assign(form, data)
   loading.value = false
 })
+
+const openEditProfile = async () => {
+  await navigateTo('/profile/edit')
+}
 </script>
