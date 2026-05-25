@@ -168,17 +168,13 @@ namespace WebApi.Controllers
             if (userForUsernameControl != null && userForUsernameControl.Id != id)
                 return Conflict($"A user with the same Username:'{userPutDto.Username}' already exists.");
 
-            var userForEmailControl = await _userService.GetUserByEmailAsync(userPutDto.Email);
-            if (userForEmailControl != null && userForEmailControl.Id != id)
-                return Conflict($"A user with the same Email:'{userPutDto.Email}' already exists.");
-
             var user = new User
             {
                 UserID = id,
                 IdentityUserId = userForControl.IdentityUserId,
                 Username = userPutDto.Username,
                 DisplayName = userPutDto.DisplayName,
-                Email = userPutDto.Email,
+                Email = userForControl.Email,
                 PhoneNumber = userPutDto.PhoneNumber,
                 ProfilePhotoUrl = userForControl.ProfilePhotoUrl,
                 Bio = userPutDto.Bio,

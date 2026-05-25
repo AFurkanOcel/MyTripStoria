@@ -83,6 +83,12 @@ export const useApi = () => {
     formData.append('file', file)
     return request<UserProfile>('/api/users/me/photo', { method: 'POST', body: formData })
   }
+  const changePassword = (currentPassword: string, newPassword: string) => {
+    return request('/api/account/change-password', {
+      method: 'POST',
+      body: { currentPassword, newPassword }
+    })
+  }
   const getCountries = () => request<Country[]>('/api/countries')
   const getCities = () => request<City[]>('/api/cities')
   const getTrips = () => request<Trip[]>('/api/trips/me')
@@ -116,6 +122,7 @@ export const useApi = () => {
     createProfile,
     updateProfile,
     uploadProfilePhoto,
+    changePassword,
     getCountries,
     getCities,
     getTrips,
