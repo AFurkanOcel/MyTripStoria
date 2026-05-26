@@ -69,12 +69,15 @@ const summary = ref<DashboardSummary | null>(null)
 const trips = ref<Trip[]>([])
 const markers = ref<TripMarker[]>([])
 const cities = ref<City[]>([])
+const resolvedHomeCoordinates = ref<{ latitude: number, longitude: number } | null>(null)
 const tripToRemove = ref<Trip | null>(null)
 
 const homeMarker = computed<TripMarker | null>(() => {
   if (!profile.value) return null
   const homeCity = cities.value.find((city) => city.id === profile.value?.cityId)
-  if (!homeCity?.latitude || !homeCity.longitude) return null
+  const latitude = resolvedHomeCoordinates.value?.latitude ?? homeCity?.latitude
+  const longitude = resolvedHomeCoordinates.value?.longitude ?? homeCity?.longitude
+  if (!latitude || !longitude) return null
 
   return {
     title: 'Home',
@@ -83,8 +86,8 @@ const homeMarker = computed<TripMarker | null>(() => {
     markerColor: '#f97316',
     cityName: profile.value.cityName || homeCity.name,
     countryName: profile.value.countryName || homeCity.countryName,
-    latitude: homeCity.latitude,
-    longitude: homeCity.longitude,
+    latitude,
+    longitude,
     startDate: '',
     endDate: ''
   }
@@ -109,12 +112,37 @@ const loadDashboard = async () => {
     trips.value = tripData
     markers.value = markerData
     cities.value = cityData
+    await resolveHomeCoordinates()
   } finally {
     loading.value = false
   }
 }
 
 onMounted(loadDashboard)
+
+const resolveHomeCoordinates = async () => {
+  resolvedHomeCoordinates.value = null
+  if (!profile.value?.cityName || !profile.value.countryName) return
+
+  try {
+    const result = await $fetch<Array<{ lat: string, lon: string }>>('https://nominatim.openstreetmap.org/search', {
+      query: {
+        q: `${profile.value.cityName}, ${profile.value.countryName}`,
+        format: 'json',
+        limit: 1
+      }
+    })
+    const match = result[0]
+    if (!match) return
+
+    resolvedHomeCoordinates.value = {
+      latitude: Number(match.lat),
+      longitude: Number(match.lon)
+    }
+  } catch {
+    // Keep the stored coordinates if geocoding is unavailable.
+  }
+}
 
 const removeTrip = async () => {
   if (!tripToRemove.value) return

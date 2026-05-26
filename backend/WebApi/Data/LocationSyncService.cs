@@ -44,11 +44,20 @@ namespace WebApi.Data
 
         private static readonly Dictionary<string, (decimal Latitude, decimal Longitude)> CityCoordinates = new(StringComparer.OrdinalIgnoreCase)
         {
+            ["Adana"] = (37.000000m, 35.321333m),
+            ["Ankara"] = (39.933365m, 32.859742m),
             ["Istanbul"] = (41.008238m, 28.978359m),
             ["Antalya"] = (36.896891m, 30.713323m),
+            ["Bursa"] = (40.188528m, 29.060964m),
+            ["Eskisehir"] = (39.776667m, 30.520556m),
+            ["Gaziantep"] = (37.066220m, 37.383320m),
             ["Izmir"] = (38.423735m, 27.142826m),
+            ["Kayseri"] = (38.720489m, 35.482597m),
+            ["Konya"] = (37.874641m, 32.493156m),
             ["Mugla"] = (37.215374m, 28.363394m),
             ["Nevsehir"] = (38.624420m, 34.723969m),
+            ["Samsun"] = (41.286667m, 36.33m),
+            ["Trabzon"] = (41.002697m, 39.716763m),
             ["Rome"] = (41.902782m, 12.496366m),
             ["Venice"] = (45.440847m, 12.315515m),
             ["Florence"] = (43.769562m, 11.255814m),
