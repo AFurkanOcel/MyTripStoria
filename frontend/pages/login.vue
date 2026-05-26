@@ -1,7 +1,7 @@
 <template>
   <div class="auth-page">
     <section class="auth-panel">
-      <NuxtLink class="brand" to="/login">
+      <NuxtLink class="brand" to="/">
         <img src="/icon.png" alt="MyTripStoria" />
         <span>MyTripStoria</span>
       </NuxtLink>

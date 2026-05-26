@@ -21,17 +21,19 @@
         <strong>{{ form.displayName || form.username || 'Traveler' }}</strong>
         <span>{{ form.isPremium ? 'Premium plan' : 'Standard plan' }}</span>
 
-        <label class="field">
-          <span>Profile photo</span>
-          <label class="file-picker">
-            <input type="file" accept="image/png,image/jpeg,image/webp" @change="pickPhoto" />
-            <span>Choose photo</span>
-            <small>{{ photoFile?.name || 'No file selected' }}</small>
+        <div class="profile-photo-upload">
+          <label class="field">
+            <span>Profile photo</span>
+            <label class="file-picker">
+              <input type="file" accept="image/png,image/jpeg,image/webp" @change="pickPhoto" />
+              <span>Choose photo</span>
+              <small>{{ photoFile?.name || 'No file selected' }}</small>
+            </label>
           </label>
-        </label>
-        <button class="btn btn-ghost" type="button" :disabled="photoUploading || !photoFile" @click="uploadPhoto">
-          {{ photoUploading ? 'Uploading photo' : 'Upload photo' }}
-        </button>
+          <button class="btn btn-primary" type="button" :disabled="photoUploading || !photoFile" @click="uploadPhoto">
+            {{ photoUploading ? 'Uploading photo' : 'Upload photo' }}
+          </button>
+        </div>
       </aside>
 
       <section v-if="!editing" class="panel profile-details">
