@@ -3,7 +3,7 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Dashboard</p>
-        <h1 class="section-title">Welcome{{ profile?.username ? `, ${profile.username}` : '' }}.</h1>
+        <h1 class="section-title">Welcome{{ profile?.username ? ` ${profile.username}` : '' }}</h1>
         <p class="subtitle">Your completed trips and planned routes, gathered on one world map.</p>
       </div>
       <NuxtLink class="btn btn-accent" to="/trips/new">Plan a new trip</NuxtLink>

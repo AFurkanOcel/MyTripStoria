@@ -3,7 +3,7 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">Trip records</p>
-        <h1 class="section-title">Manage every trip in one place.</h1>
+        <h1 class="section-title">Manage every trip in one place</h1>
         <p class="subtitle">Search, filter, edit, or remove your planned routes and completed memories.</p>
       </div>
       <NuxtLink class="btn btn-accent" to="/trips/new">New trip</NuxtLink>

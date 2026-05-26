@@ -8,7 +8,7 @@
 
       <div>
         <p class="eyebrow">New account</p>
-        <h1 class="title">Create your MyTripStoria account.</h1>
+        <h1 class="title">Create your MyTripStoria account</h1>
         <p class="subtitle">Your profile keeps every planned route and completed trip connected to your own travel story.</p>
       </div>
 

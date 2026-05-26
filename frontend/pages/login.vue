@@ -8,7 +8,7 @@
 
       <div>
         <p class="eyebrow">Your trips on one map</p>
-        <h1 class="title">Plan future escapes and keep every travel memory in one place.</h1>
+        <h1 class="title">Plan future escapes and keep every travel memory in one place</h1>
         <p class="subtitle">Sign in to revisit past trips, plan new routes, and grow your travel archive with premium photo memories.</p>
       </div>
 

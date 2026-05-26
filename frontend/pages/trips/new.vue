@@ -3,7 +3,7 @@
     <header class="topbar">
       <div>
         <p class="eyebrow">New trip</p>
-        <h1 class="section-title">Create a planned route or completed trip.</h1>
+        <h1 class="section-title">Create a planned route or completed trip</h1>
         <p class="subtitle">Choose a city and MyTripStoria will place it on your world map automatically.</p>
       </div>
       <NuxtLink class="btn btn-ghost" to="/dashboard">Dashboard</NuxtLink>
