@@ -76,9 +76,9 @@ export interface Trip {
 }
 
 export interface TripMarker {
-  tripID: number
+  tripID?: number
   title: string
-  status: TripStatus
+  status: TripStatus | 'Home'
   markerType: string
   markerColor: string
   placeName?: string

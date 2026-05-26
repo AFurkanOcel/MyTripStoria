@@ -624,6 +624,10 @@ button {
   background: var(--ongoing);
 }
 
+.badge-home {
+  background: var(--accent);
+}
+
 .badge-muted {
   background: var(--muted);
 }

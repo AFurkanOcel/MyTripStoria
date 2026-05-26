@@ -24,9 +24,10 @@
             <span class="badge badge-planned">Planned</span>
             <span class="badge badge-completed">Completed</span>
             <span class="badge badge-ongoing">Ongoing</span>
+            <span class="badge badge-home">Home</span>
           </div>
         </div>
-        <TripWorldMap :markers="markers" />
+        <TripWorldMap :markers="mapMarkers" />
       </div>
 
       <aside class="panel">
@@ -59,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import type { DashboardSummary, Trip, TripMarker, UserProfile } from '~/types'
+import type { City, DashboardSummary, Trip, TripMarker, UserProfile } from '~/types'
 
 const api = useApi()
 const profile = useState<UserProfile | null>('profile')
@@ -67,21 +68,47 @@ const loading = ref(true)
 const summary = ref<DashboardSummary | null>(null)
 const trips = ref<Trip[]>([])
 const markers = ref<TripMarker[]>([])
+const cities = ref<City[]>([])
 const tripToRemove = ref<Trip | null>(null)
+
+const homeMarker = computed<TripMarker | null>(() => {
+  if (!profile.value) return null
+  const homeCity = cities.value.find((city) => city.id === profile.value?.cityId)
+  if (!homeCity?.latitude || !homeCity.longitude) return null
+
+  return {
+    title: 'Home',
+    status: 'Home',
+    markerType: 'Home',
+    markerColor: '#f97316',
+    cityName: profile.value.cityName || homeCity.name,
+    countryName: profile.value.countryName || homeCity.countryName,
+    latitude: homeCity.latitude,
+    longitude: homeCity.longitude,
+    startDate: '',
+    endDate: ''
+  }
+})
+
+const mapMarkers = computed(() => {
+  return homeMarker.value ? [homeMarker.value, ...markers.value] : markers.value
+})
 
 const loadDashboard = async () => {
   try {
     loading.value = true
-    const [profileData, summaryData, tripData, markerData] = await Promise.all([
+    const [profileData, summaryData, tripData, markerData, cityData] = await Promise.all([
       api.getMe(),
       api.getSummary(),
       api.getTrips(),
-      api.getMarkers()
+      api.getMarkers(),
+      api.getCities()
     ])
     profile.value = profileData
     summary.value = summaryData
     trips.value = tripData
     markers.value = markerData
+    cities.value = cityData
   } finally {
     loading.value = false
   }
