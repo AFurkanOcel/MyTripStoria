@@ -373,7 +373,7 @@ This project helped improve my experience in:
 
 ## Author
 
-**A. Furkan OCEL**
+**A. Furkan ÖCEL**
 
 ---
 
