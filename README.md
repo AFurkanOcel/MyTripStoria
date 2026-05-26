@@ -188,8 +188,6 @@ MyTripStoria/
 `-- README.md
 ```
 
-Screenshot files are stored inside `assets/screenshots` so they remain available when the project is viewed on GitHub.
-
 ---
 
 ## Database
