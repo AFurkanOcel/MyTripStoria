@@ -158,16 +158,7 @@ Contains domain models such as users, trips, trip photos, countries, cities, sta
 MyTripStoria/
 |-- assets/
 |   |-- branding/
-|   |   `-- icon.png
 |   `-- screenshots/
-|       |-- landing.png
-|       |-- login.png
-|       |-- dashboard.png
-|       |-- trip-records.png
-|       |-- new-trip.png
-|       |-- trip-details.png
-|       |-- profile.png
-|       `-- settings.png
 |-- backend/
 |   |-- Contracts/
 |   |-- Entities/
