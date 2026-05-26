@@ -7,28 +7,22 @@
       </NuxtLink>
 
       <div class="actions">
-        <NuxtLink v-if="hasToken" class="btn btn-ghost" to="/dashboard">Open dashboard</NuxtLink>
-        <template v-else>
-          <NuxtLink class="btn btn-ghost" to="/login">Log in</NuxtLink>
-          <NuxtLink class="btn btn-primary" to="/register">Create account</NuxtLink>
-        </template>
+        <NuxtLink class="btn btn-ghost" to="/login">Log in</NuxtLink>
+        <NuxtLink class="btn btn-primary" to="/register">Create account</NuxtLink>
       </div>
     </nav>
 
     <section class="landing-hero">
       <div class="landing-copy">
         <p class="eyebrow">Travel planning and memory keeping</p>
-        <h1>Plan future escapes and preserve every trip you have lived.</h1>
+        <h1>Plan future escapes and preserve every trip you have lived</h1>
         <p>
           MyTripStoria turns your vacations into a beautiful map-based archive, with planned routes,
           completed memories, travel notes, and premium photo collections in one private workspace.
         </p>
         <div class="actions">
-          <NuxtLink v-if="hasToken" class="btn btn-primary" to="/dashboard">Open dashboard</NuxtLink>
-          <template v-else>
-            <NuxtLink class="btn btn-primary" to="/register">Create your travel story</NuxtLink>
-            <NuxtLink class="btn btn-ghost" to="/login">Log in</NuxtLink>
-          </template>
+          <NuxtLink class="btn btn-primary" to="/register">Create your travel story</NuxtLink>
+          <NuxtLink class="btn btn-ghost" to="/login">Log in</NuxtLink>
         </div>
       </div>
 
@@ -85,10 +79,4 @@
 </template>
 
 <script setup lang="ts">
-const api = useApi()
-const hasToken = ref(false)
-
-onMounted(() => {
-  hasToken.value = Boolean(api.loadToken())
-})
 </script>
