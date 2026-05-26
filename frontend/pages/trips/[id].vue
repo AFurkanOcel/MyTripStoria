@@ -8,7 +8,7 @@
       </div>
       <div class="actions">
         <button v-if="trip" class="btn btn-primary" type="button" @click="openEdit">Edit trip</button>
-        <NuxtLink class="btn btn-ghost" to="/">Dashboard</NuxtLink>
+        <NuxtLink class="btn btn-ghost" to="/dashboard">Dashboard</NuxtLink>
       </div>
     </header>
 

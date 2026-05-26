@@ -54,7 +54,7 @@ const submit = async () => {
 
   try {
     await api.login(email.value, password.value)
-    await navigateTo('/')
+    await navigateTo('/dashboard')
   } catch {
     error.value = 'The email or password is incorrect.'
   } finally {

@@ -6,7 +6,7 @@
   <div v-else class="app-shell">
     <aside class="sidebar">
       <div class="sidebar-top">
-        <NuxtLink class="brand" to="/">
+        <NuxtLink class="brand" to="/dashboard">
           <img src="/icon.png" alt="MyTripStoria" />
           <span>MyTripStoria</span>
         </NuxtLink>
@@ -20,7 +20,7 @@
         </NuxtLink>
 
         <nav class="nav">
-          <NuxtLink to="/">Dashboard</NuxtLink>
+          <NuxtLink to="/dashboard">Dashboard</NuxtLink>
           <NuxtLink to="/trips">Trip records</NuxtLink>
           <NuxtLink to="/trips/new">New trip</NuxtLink>
           <NuxtLink to="/profile">Profile</NuxtLink>
@@ -55,8 +55,8 @@ const route = useRoute()
 const api = useApi()
 const profile = useState<UserProfile | null>('profile', () => null)
 const showSignOut = ref(false)
-const authRoutes = ['/login', '/register', '/forgot-password', '/reset-password']
-const isAuthPage = computed(() => authRoutes.includes(route.path))
+const publicShellRoutes = ['/', '/login', '/register', '/forgot-password', '/reset-password']
+const isAuthPage = computed(() => publicShellRoutes.includes(route.path))
 
 const displayName = computed(() => profile.value?.displayName || profile.value?.username || 'Traveler')
 const profilePhoto = computed(() => {

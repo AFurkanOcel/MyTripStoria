@@ -207,7 +207,7 @@ const submit = async () => {
       budget: 0,
       isPremium: form.isPremium
     })
-    await navigateTo('/')
+    await navigateTo('/dashboard')
   } catch (err) {
     const message = getApiErrorMessage(err)
     error.value = message

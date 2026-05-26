@@ -750,6 +750,170 @@ button {
   color: var(--muted);
 }
 
+.landing-page {
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px clamp(18px, 5vw, 64px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.86);
+  background: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(14px);
+}
+
+.landing-brand {
+  color: var(--text);
+}
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(420px, 1.14fr);
+  gap: clamp(24px, 5vw, 64px);
+  align-items: center;
+  min-height: calc(100vh - 82px);
+  padding: clamp(28px, 6vw, 72px) clamp(18px, 5vw, 64px);
+}
+
+.landing-copy {
+  display: grid;
+  gap: 22px;
+}
+
+.landing-copy h1 {
+  margin: 0;
+  max-width: 760px;
+  font-size: clamp(42px, 7vw, 76px);
+  line-height: 1.02;
+}
+
+.landing-copy p:not(.eyebrow) {
+  max-width: 660px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.landing-map {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #dbeafe;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.18);
+}
+
+.landing-map .auth-visual {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  padding: 0;
+}
+
+.landing-map-card,
+.landing-route-card {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: 7px;
+  width: min(260px, calc(100% - 32px));
+  border: 1px solid rgba(226, 232, 240, 0.82);
+  border-radius: 8px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.18);
+}
+
+.landing-map-card {
+  left: 18px;
+  bottom: 18px;
+}
+
+.landing-route-card {
+  top: 18px;
+  right: 18px;
+}
+
+.landing-map-card small,
+.landing-route-card small {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.landing-features,
+.landing-pricing {
+  display: grid;
+  gap: 18px;
+  padding: 0 clamp(18px, 5vw, 64px) clamp(42px, 6vw, 72px);
+}
+
+.landing-features {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.landing-features article,
+.landing-pricing,
+.pricing-grid article {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.landing-features article {
+  display: grid;
+  gap: 10px;
+  padding: 22px;
+}
+
+.landing-features article span {
+  color: var(--primary);
+  font-weight: 900;
+}
+
+.landing-features h2,
+.landing-pricing h2,
+.pricing-grid h3 {
+  margin: 0;
+}
+
+.landing-features p,
+.pricing-grid p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.landing-pricing {
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+  align-items: start;
+  padding-top: 28px;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pricing-grid article {
+  padding: 20px;
+}
+
+.pricing-premium {
+  border-color: rgba(249, 115, 22, 0.34) !important;
+  background: rgba(249, 115, 22, 0.08) !important;
+}
+
 @media (max-width: 980px) {
   .auth-page,
   .app-shell,
@@ -758,12 +922,25 @@ button {
   .profile-grid,
   .records-grid,
   .records-toolbar,
-  .profile-details {
+  .profile-details,
+  .landing-hero,
+  .landing-features,
+  .landing-pricing,
+  .pricing-grid {
     grid-template-columns: 1fr;
   }
 
-  .auth-visual {
+  .auth-page .auth-visual {
     display: none;
+  }
+
+  .landing-hero {
+    min-height: auto;
+  }
+
+  .landing-map,
+  .landing-map .auth-visual {
+    min-height: 420px;
   }
 
   .sidebar {
@@ -798,5 +975,20 @@ button {
   .trip-card-link {
     padding-right: 14px;
     padding-top: 48px;
+  }
+
+  .landing-nav {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .landing-copy h1 {
+    font-size: 40px;
+  }
+
+  .landing-map-card,
+  .landing-route-card {
+    position: static;
+    margin: 12px;
   }
 }
