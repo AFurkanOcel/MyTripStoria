@@ -13,6 +13,7 @@ A modern travel planning and memory keeping platform built with .NET 8, Nuxt 3, 
   <img src="https://img.shields.io/badge/ORM-EF%20Core-2E7D32"/>
   <img src="https://img.shields.io/badge/Database-SQL%20Server-CC2927"/>
   <img src="https://img.shields.io/badge/Architecture-Layered-FF8C00"/>
+  <img src="https://img.shields.io/badge/Status-Completed-brightgreen"/>
 </p>
 
 ---
