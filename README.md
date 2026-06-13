@@ -1,6 +1,9 @@
 <h1 align="center">MyTripStoria</h1>
 
 <p align="center">
+  <img width="92" alt="MyTripStoria icon" src="assets/branding/icon.png" />
+</p>
+<p align="center">
 A modern travel planning and memory keeping platform built with .NET 8, Nuxt 3, Vue, Leaflet, Entity Framework Core, and SQL Server.
 </p>
 
@@ -12,6 +15,7 @@ A modern travel planning and memory keeping platform built with .NET 8, Nuxt 3, 
   <img src="https://img.shields.io/badge/Map-Leaflet-199900"/>
   <img src="https://img.shields.io/badge/ORM-EF%20Core-2E7D32"/>
   <img src="https://img.shields.io/badge/Database-SQL%20Server-CC2927"/>
+  <img src="https://img.shields.io/badge/API-Swagger-brightgreen"/>
   <img src="https://img.shields.io/badge/Architecture-Layered-FF8C00"/>
   <img src="https://img.shields.io/badge/Status-Completed-brightgreen"/>
 </p>
